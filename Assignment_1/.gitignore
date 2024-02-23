@@ -1,6 +1,9 @@
 # VSCode
 .vscode/
 
+# DB Folder
+db/
+
 # Prerequisites
 *.d
 

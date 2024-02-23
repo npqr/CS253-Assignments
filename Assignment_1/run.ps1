@@ -1,5 +1,14 @@
 # Compile the C++ code
-& g++ main.cpp -o main
+mkdir .\db > $null -ErrorAction SilentlyContinue
+
+# Check if directory creation failed
+if (-not (Test-Path .\db)) {
+    Write-Host "Error: Administrative privileges are required to create the directory."
+    Write-Host "Please run the script with elevated privileges."
+    exit 1
+}
+
+& g++ -o main main.cpp "include\sqlite\libsqlite3.a" -I"\include\sqlite" -static-libgcc -static-libstdc++
 
 # Check if compilation was successful
 if ($LASTEXITCODE -eq 0) {
