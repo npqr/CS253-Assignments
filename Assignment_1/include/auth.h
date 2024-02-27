@@ -7,8 +7,12 @@ void registerUser(sqlite3* db, const User& user) {
     string Name = user.getName();
     string ID = user.getID();
     string password = user.getPassword();
+    string memType = user.memberType;
+    double record  = user.getRecord();
+    double fine = user.getFine();
+    int rentlim = 5;
 
-    string query = "INSERT INTO Users (Name, ID, Password) VALUES (?, ?, ?)";
+    string query = "INSERT INTO Users (Name, ID, Password, MemberType, Record, Fine, RentLimit) VALUES (?, ?, ?, ?, ?, ?, ?)";
     sqlite3_stmt* stmt;
     int rc = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
@@ -19,10 +23,14 @@ void registerUser(sqlite3* db, const User& user) {
     sqlite3_bind_text(stmt, 1, Name.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 2, ID.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 3, password.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 4, memType.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_double(stmt, 5, record);
+    sqlite3_bind_double(stmt, 6, fine);
+    sqlite3_bind_int(stmt, 7, rentlim);
 
     rc = sqlite3_step(stmt);
     if (rc == SQLITE_DONE) {
-        cout << "Hi! " << Name << ", You have registered successfully with ID : " << ID << endl;
+        cout << "Hi! " << Name << ", You have registered successfully with ID : " << ID << "as a " << memType << endl;
     } else {
         cerr << "Error registering user." << endl;
     }

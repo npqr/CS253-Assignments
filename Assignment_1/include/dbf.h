@@ -3,7 +3,7 @@
 
 //// Database Functions         //////////////////////////////////////
 
-#include "user.h"
+#include "classes.h"
 #include "sqlite/sqlite3.h"
 
 int executeQuery(sqlite3* db, const char* sql) {
@@ -30,14 +30,22 @@ void createDatabase(const string& filename) {
         exit(1);
     }
 
-    const char* createTableQuery = "CREATE TABLE Users (Name TEXT NOT NULL, ID TEXT NOT NULL PRIMARY KEY, Password TEXT NOT NULL)";
-    if (executeQuery(db, createTableQuery) != SQLITE_OK) {
+    const char* createUsers = "CREATE TABLE Users (Name TEXT NOT NULL, ID TEXT NOT NULL PRIMARY KEY, Password TEXT NOT NULL, MemberType TEXT NOT NULL, Record REAL, Fine REAL, RentLimit INTEGER, RentedCars TEXT)";
+    if (executeQuery(db, createUsers) != SQLITE_OK) { 
         cerr << "Error creating Users table." << endl;
         sqlite3_close(db);
         exit(1);
     }
 
-    cout << "SQLite database and Users table created successfully." << endl;
+    
+    const char* createCars = "CREATE TABLE Cars (Model TEXT, RegistrationNo TEXT PRIMARY KEY, Condition TEXT, isRented INTEGER, RenterID TEXT, RenterName TEXT, RenterType TEXT, DueDate TEXT)";
+    if (executeQuery(db, createCars) != SQLITE_OK) { 
+        cerr << "Error creating Car table." << endl;
+        sqlite3_close(db);
+        exit(1);
+    }
+
+    cout << "SQLite database and tables created successfully." << endl;
     sqlite3_close(db);
 }
 

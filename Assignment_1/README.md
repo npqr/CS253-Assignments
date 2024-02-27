@@ -5,15 +5,19 @@
 You are required to implement a car rental system in C++ language using **Object-Oriented Programming concepts**. Implement the system on command line interface.
 
 List of basic functionalities:
+
 1. Keep records of cars rented per customer/employee.
+
 2. A customer is given a car if his/her `customer_record` is good enough. A `customer_record` is updated based on several factors:
 
     a. Car returned later than `return_date`.
 
     b. Damage caused to the car. The condition in which the car has been returned.
 
-    c. The same will be for employees i.e. employee_record.
+    c. The same will be for employees i.e. `employee_record`.
+
 3. Maintain different databases for customers, employees, and cars.
+
 4. Maintain three different classes for customers, employees, and manager.
 
     a. A **customer** can see all the available cars. Can browse all the cars he is currently renting. Can rent a limited number of cars as per his/her `customer_record`. (Optional: If a customer is new, register him with an average `customer_record` value). A fine will be imposed per day from the day of return.
