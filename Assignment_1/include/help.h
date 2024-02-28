@@ -2,9 +2,10 @@
 #define HELP_H
 
 //// Helper Functions             //////////////////////////////////////
+#include "global.h"
 
-string getPassword() {
-    string password;
+std::string getPassword() {
+    std::string password;
     char ch;
 
     #ifdef _WIN32

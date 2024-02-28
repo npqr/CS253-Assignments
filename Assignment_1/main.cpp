@@ -7,107 +7,79 @@
 #include "include/classes.h"    // Include the classes header file
 #include "include/classes.cpp"  // Include the classes implementation file
 
+#define cout std::cout
+#define cin std::cin
+
 //// Main Function                //////////////////////////////////////
 
 int main() {
+
     Sleep(300);
     cout << "Welcome to Car Rental System!!. Working on " << get_platform_name() << " platform." << endl;
+
     Sleep(1000);
     clearScreen();
-
-    string filename = "db/catDistributionSystem.sqlite3";
-
-    // Check if the database file exists, create it if not
-    if (!databaseExists(filename)) {
-        cout << "Database file not found. Creating database..." << endl;
-        createDatabase(filename);
-        // cout << "DBBACKBODI DONE\n";
-    }
-
-    // Connect to the SQLite database
-    sqlite3* db;
-    int rc = sqlite3_open(filename.c_str(), &db);
-    if (rc != SQLITE_OK) {
-        cerr << "Error opening SQLite database: " << sqlite3_errmsg(db) << endl;
-        sqlite3_close(db);
-        exit(1);
-    }
+    
+    God God;
+    God.importData();
 
     User currentUser;
 
-    // Ask the user whether to register or login
-    string action;
+    std::string action;
     cout << "Welcome to CaR-e-MaSyS!\n";
     cout << "Do you want to register or login? (r/l): ";
 
-    string role;
+    std::string role;
     while((action != "r") || (action != "l")) {
         cin >> action;
         if (action == "r") {
-            while((role != "c") || (role != "e") || (role != "m"))
+            while((role != "c") || (role != "e"))
             {
-                cout << "Please select your role: \n 1. Customer (c) \n 2. Employee (e) \n 3. Manager (m) : ";
+                cout << "Please select your role: \n 1. Customer (c) \n 2. Employee (e) : ";
                 cin >> role;
 
+                clearScreen();
                 if(role == "c") {
                     cout << "You have selected Customer role.\n";
                 }
                 else if(role == "e") {
                     cout << "You have selected Employee role.\n";
                 }
-                else if(role == "m") {
-                    cout << "You have selected Manager role.\n";
-                }
                 else {
-                    clearScreen();
                     cout << "Invalid role! Please select a valid role.\n";
                     continue;
                 }
                 
                 char back;
-                cout << "Press (b) to go select another role. Press any other key to continue... " << endl; 
+                cout << "Press (b) to go select another role. Press any other key to continue... "; 
                 getchar();
                 back = getchar();
 
                 if(back == 'b') {
                     clearScreen(); 
                     continue;
-                    }
+                }
                 else break;
             }
 
             // Registration
-            string Name, ID, password;
+            std::string Name, ID, password;
             cout << "Hi! Please Enter your Name: ";
             cin >> Name;
 
             bool unique_ID = false;
             while(unique_ID == false) {
-            cout << "Enter a ID: ";
-            cin >> ID;
-           
-            //check if ID already exists
-            string query = "SELECT COUNT(*) FROM Users WHERE ID = ?";
-            sqlite3_stmt* stmt;
-           
-            int rc = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, NULL);
-            if (rc != SQLITE_OK) {
-                cerr << "Error preparing SQL statement: " << sqlite3_errmsg(db) << endl;
-                break;
-            }
+                cout << "Enter a ID: ";
+                cin >> ID;
+                
+                //check if ID already exists
 
-            sqlite3_bind_text(stmt, 1, ID.c_str(), -1, SQLITE_STATIC);
-            rc = sqlite3_step(stmt);
-            int count = sqlite3_column_int(stmt, 0);
-            sqlite3_finalize(stmt);
-
-            if (count > 0) {
-                cerr << "ID '" << ID << "' already exists. Please choose a different ID." << endl;
-            }
-            else {
-                unique_ID = true;
-            }
-        
+                if (God.findUser(ID) == true){
+                    cerr << "ID '" << ID << "' already exists. Please choose a different ID." << endl;
+                }
+                else {
+                    unique_ID = true;
+                }
             }
 
             cout << "Create a password: ";
@@ -115,15 +87,11 @@ int main() {
 
             if(role == "c") {
                 Customer newUser(Name, ID, password);
-                registerUser(db, newUser);
+                God.addUser(newUser);
             }
             else if(role == "e") {
                 Employee newUser(Name, ID, password);
-                registerUser(db, newUser);
-            }
-            else if(role == "m") {
-                Manager newUser(Name, ID, password);
-                registerUser(db, newUser);
+                God.addUser(newUser);
             }
            
             break;
@@ -131,7 +99,7 @@ int main() {
         else if (action == "l") {
             // Login
             bool auth = false;
-            string ID, password;
+            std::string ID, password;
             
             while(auth != true) {
                 
@@ -142,11 +110,11 @@ int main() {
                 password = getPassword();
 
                 clearScreen();
-                auth = loginUser(db, ID, password);
+                auth = God.login(ID, password);
             }
 
-            currentUser.fetchDB(db, ID);
-            string rolee = currentUser.memberType;
+            currentUser = God.getUser(ID);
+            std::string rolee = currentUser.memberType;
             if(rolee == "Customer")
                 role = "c";
             else if(rolee == "Employee")
@@ -164,6 +132,9 @@ int main() {
         }
     }
 
+    God.exportData();
+    God.importData();
+    
     // Main menu
 
     if(role == "c" || role == "e") {
@@ -203,7 +174,7 @@ int main() {
                     // Browse & Rent
                     
                     cout << "All cars available : " << endl;
-                    currentUser.showAllCars(db);
+                    // currentUser.showAllCars(db);
 
                     cout << "this is alllfdsfsdfdsfdsfdsfsdfdsf\n";
                     break;
@@ -229,7 +200,7 @@ int main() {
         int choice;
         do {
             // Display menu
-            Sleep(1000);
+            Sleep(600);
             clearScreen();
 
             cout << "Welcome to the Manager Menu!" << endl;
@@ -255,53 +226,71 @@ int main() {
             }
 
             // Process user's choice
-            string action;
+            std::string action, view;
             switch (choice) {
                 case 1:
                     // View All Cars
-                    currManager.showAllCars(db); 
+                    God.showAllCars();
+
+                    cout << "Press any key to continue... ";
+                    getchar();
+                    getchar();
+
                     break;
+
                 case 2:
                     // Modify Cars
                     cout << "Do you want to add, update or delete a car? (a/u/d): ";
                     cin >> action;
 
+                    cout << "Do you want to view all the cars first? (y/n): ";
+                    cin >> view;
+
+                    if(view == "y") {
+                        God.showAllCars();
+                        cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+                    }
+
                     if (action == "a") {
                         // Add a car
                         Car car;
-
+                        std::string model, regNo, renterID, renterType, dueDate;
+                        float condition;
+                        bool isRented;
+                        
                         cout << "Enter the car model: ";
-                        cin >> car.model;
+                        cin >> model;
 
                         cout << "Enter the registration number: ";
-                        cin >> car.regNo;
+                        cin >> regNo;
 
                         cout << "Enter the condition: ";
-                        cin >> car.condition;
+                        cin >> condition;
 
-                        char isRented;
+                        std::string isR;
                         cout << "Is it rented? (y/n): ";
-                        cin >> isRented;
+                        cin >> isR;
 
-                        if(isRented == 'y') {
-                            car.isRented = true;
+                        isRented = (isR == "y") ? true : false;
+
+                        if(isRented) {
 
                             cout << "Enter the renter's ID: ";
-                            cin >> car.renterID;
+                            cin >> renterID;
 
                             cout << "Enter the renter type: ";
-                            cin >> car.renterType;
+                            cin >> renterType;
 
                             cout << "Enter the due date: ";
-                            cin >> car.dueDate;
+                            cin >> dueDate;
                         }
                         else {
-                            car.isRented = false;
-
-                            car.renterID = "";
-                            car.renterType = "";
-                            car.dueDate = "";
+                            isRented = false;
+                            renterID = "";
+                            dueDate = "";
                         }
+
+                        car = Car(model, regNo, condition, isRented, renterID, dueDate);
 
                         cout << "Following are the details of the car you want to add: \n";
                         car.getDetails();
@@ -311,7 +300,7 @@ int main() {
                         cin >> confirm;
 
                         if(confirm == 'y') {
-                            currManager.addCar(db, car);
+                            God.addCar(car);
                         }
                         
 
@@ -319,62 +308,71 @@ int main() {
                         // Update a car
                         
                         Car car;
+                        std::string regNo, renterID, renterType, dueDate;
+                        float condition;
+                        bool isRented;
+                        std::string act;
 
                         cout << "Enter the registration number of the car you want to update: ";
-                        cin >> car.regNo;
+                        cin >> regNo;
 
-                        cout << "Enter the new condition: ";
-                        cin >> car.condition;
+                        cout << "Do you want to update the condition? (y/n): ";
+                        cin >> act;
+
+                        if(act == "y") {
+                            cout << "Enter the new condition: ";
+                            cin >> condition;
+                        }
 
                         cout << "Do you want to update the renter's details? (y/n): ";
-                        char updateRenter;
-                        cin >> updateRenter;
+                        cin >> act;
 
-                        if(updateRenter == 'y') {
+                        if(act == "y") {
                             cout << "Is it still rented? (y/n): ";
-                            char isRented;
-                            cin >> isRented;
+                            std::string isR;
+                            cin >> isR;
 
-                            if(isRented == 'y') {
-                                car.isRented = true;
+                            if(isR == "y") {
+                                isRented = true;
 
                             cout << "Enter the renter's ID: ";
-                            cin >> car.renterID;
+                            cin >> renterID;
 
                             cout << "Enter the renter type: ";
-                            cin >> car.renterType;
+                            cin >> renterType;
 
                             cout << "Enter the due date: ";
-                            cin >> car.dueDate;
+                            cin >> dueDate;
+
                             }
                             else {
-                                car.isRented = false;
-
-                                car.renterID = "";
-                                car.renterType = "";
-                                car.dueDate = "";
+                                isRented = false;
+                                renterID = "";
+                                renterType = "";
+                                dueDate = "";
                             }
                         }
 
-                        currManager.updateCar(db, car);
+                        car = Car(God.getCar(regNo).getModel(), regNo, condition, isRented, renterID, dueDate);
+                        God.updateCar(car);
+
                     } else if (action == "d") {
                         // Delete a car
                         Car car;
+                        std::string regNo;
 
                         cout << "Enter the registration number of the car you want to delete: ";
-                        cin >> car.regNo;
+                        cin >> regNo;
 
                         cout << "Are you sure you want to delete this car? (y/n): ";
                         char confirm;
                         cin >> confirm;
 
                         if(confirm == 'y') {
-                            car.fetchDB(db);
-                            car.getDetails();
-                            currManager.removeCar(db, car);
+                            God.removeCar(God.getCar(regNo));
+                            cout << "Car deleted successfully." << endl;
                         }
                         
-
                     } else {
                         clearScreen();
                         cout << ANSI_COLOR_RED << "Invalid action. Please try again." << ANSI_COLOR_RESET << endl;
@@ -396,7 +394,7 @@ int main() {
         } while (choice != 5);
     }
 
-    // Close the database connection
-    sqlite3_close(db);
+    God.exportData();
 
+    return 0;
 }

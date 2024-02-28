@@ -1,14 +1,11 @@
 #ifndef CLASSES_H
 #define CLASSES_H
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include "sqlite/sqlite3.h"
-using namespace std;
+#include "global.h"
 
 //// Class Declarations           //////////////////////////////////////
 
+class God;
 class User;
 class Customer;
 class Employee;
@@ -19,12 +16,12 @@ class Car;
 
 class User {
 protected:
-    string name = "";    
-    string ID = "";
-    string password = "";
+    std::string name = "";    
+    std::string ID = "";
+    std::string password = "";
     double record = 0.0;
     double fine = 0.0;
-    vector<Car> rentedCars;
+    std::vector<Car> rentedCars;
 
 public:
     int rentLimit = 0;
@@ -33,7 +30,7 @@ public:
     void clearDue() { fine = 0.0; }
     void rentCar(Car &car);
     void returnCar(Car &car);
-    void showAllCars(sqlite3* db);
+
     void showMyCars();
 
     double getRecord() const { return record; }
@@ -41,16 +38,16 @@ public:
 
     // void Logout();
 
-    string memberType = "";
+    std::string memberType = "";
 
     User() {};
 
-    User(const string& name, string ID, const string& password)
+    User(const std::string& name, std::string ID, const std::string& password)
         : name(name), ID(ID), password(password) {}
 
-    string getName() const { return name; }
-    string getID() const { return ID; }
-    string getPassword() const { return password; }
+    std::string getName() const { return name; }
+    std::string getID() const { return ID; }
+    std::string getPassword() const { return password; }
     
     void getDetails() const {
         cout << "Name: " << name << "\t\t ID : " << ID << endl;
@@ -59,9 +56,10 @@ public:
     }
     
     friend Manager;
+    friend God;
 
-    void fetchDB(sqlite3* db, string ID);
-    void updateDB(sqlite3* db, string ID);
+    void fetchDB(std::string ID);
+    void updateDB(std::string ID);
 };
 
 // Also add Help function
@@ -70,7 +68,7 @@ public:
 
 class Customer : public User {    
 public:
-    Customer(const string& name, string ID, const string& password)
+    Customer(const std::string& name, std::string ID, const std::string& password)
         : User(name, ID, password) {
         memberType = "Customer";
     }
@@ -84,7 +82,7 @@ public:
 class Employee : public User {
 
 public:
-    Employee(const string& name, string ID, const string& password)
+    Employee(const std::string& name, std::string ID, const std::string& password)
         : User(name, ID, password) {
         memberType = "Employee";
     }
@@ -93,42 +91,30 @@ public:
     void getEmployeeRecord () const { cout << "Employee record: " << record << endl; }
 };
 
-//// Manager Class                //////////////////////////////////////
-
-class Manager : public User {
-public:
-    Manager(const string& name, string ID, const string& password)
-        : User(name, ID, password) {
-        memberType = "Manager";
-    }
-
-    void addUser(sqlite3* db, User &user);
-    void removeUser(sqlite3* db, User &user);
-    void updateUser(sqlite3* db, User &user);
-
-    void addCar(sqlite3* db, Car &car);
-    void removeCar(sqlite3* db, Car &car);
-    void updateCar(sqlite3* db, Car &car);
-
-};
-
 //// Car Class                    //////////////////////////////////////
 
 class Car {
-public:
-    string model = "";
-    string regNo = "";
+protected:
+    std::string model = "";
+    std::string regNo = "";
     float condition = 0.0;
     bool isRented = false;
-    string renterID = "";
-    string renterName = "";
-    string renterType = "";
-    string dueDate = "";
+    std::string renterID = "";
+    std::string dueDate = "";
+public:
 
     Car() {};
 
-    Car(string model, string regNo, float condition)
-        : model(model), regNo(regNo), condition(condition), isRented(false) {}
+    Car(std::string model, std::string regNo, float condition, bool isRented, std::string renterID, std::string dueDate)
+        : model(model), regNo(regNo), condition(condition), isRented(isRented), renterID(renterID), dueDate(dueDate) {}
+
+
+    std::string getModel() const { return model; }
+    std::string getRegNo() const { return regNo; }
+    float getCondition() const { return condition; }
+    bool getisRented() const { return isRented; }
+    std::string getRenterID() const { return renterID; }
+    std::string getdueDate() const { return dueDate; }
 
     void showDueDate() const {
         cout << "Due date: " << dueDate << endl;
@@ -146,17 +132,61 @@ public:
         } else {
             isRented = true;
             renterID = user.getID();
-            renterName = user.getName();
-            renterType = user.memberType;
             cout << "Car rented successfully." << endl;
             getDetails();
         }
     }
 
-    void fetchDB(sqlite3* db);
-    void updateDB(sqlite3* db);
+    void fetchDB();
+    void updateDB();
 
     friend Manager;
+};
+
+//// God Class                    //////////////////////////////////////
+
+class God {
+protected:
+    std::map<std::string, User> Users;
+    std::map<std::string, Car> Cars;
+
+public:
+    bool findUser(std::string ID);
+    bool findCar(std::string regNo);
+
+    void addUser(User &user);
+    void updateUser(User &user);
+    void removeUser(User &user);
+
+    void addCar(Car &car);
+    void updateCar(Car &car);
+    void removeCar(Car &car);
+
+    void showAllUsers();
+    void showAllCars();
+
+    bool login(std::string ID, std::string password);
+    void logout();
+
+    User& getUser(std::string ID);
+    Car& getCar(std::string regNo);
+
+    void importData();
+    void exportData();
+    
+};
+
+//// Manager Class                //////////////////////////////////////
+
+class Manager : public User {
+protected:
+public:
+    Manager () {};
+
+    Manager(const std::string& name, std::string ID, const std::string& password)
+        : User(name, ID, password) {
+        memberType = "Manager";
+    }
 };
 
 #endif // CLASSES_H

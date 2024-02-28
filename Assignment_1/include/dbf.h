@@ -4,51 +4,85 @@
 //// Database Functions         //////////////////////////////////////
 
 #include "classes.h"
-#include "sqlite/sqlite3.h"
+#include "jsoncpp/json/json.h"
+#include "jsoncpp/json/json-forwards.h"
+#include "global.h"
 
-int executeQuery(sqlite3* db, const char* sql) {
-    char* errMsg;
-    int rc = sqlite3_exec(db, sql, NULL, NULL, &errMsg);
-    if (rc != SQLITE_OK) {
-        cerr << "SQL error: " << errMsg << endl;
-        sqlite3_free(errMsg);
+void God::importData() {
+
+    Json::Value root;
+    ifstream file("db/data.json");
+    // ifstream file("db/sampledata.json");
+    file >> root;
+    file.close();
+
+    for (auto user : root["users"]) {
+        User newUser(
+        (std::string) user["name"].asString(),
+        (std::string) user["ID"].asString(), 
+        (std::string) user["password"].asString());
+        newUser.rentLimit = user["rentLimit"].asInt();
+        newUser.memberType = user["memberType"].asString();
+        newUser.record = user["record"].asDouble();
+        newUser.fine = user["fine"].asDouble();
+        Users[newUser.getID()] = newUser;
     }
-    return rc;
+
+    for (auto car : root["cars"]) {
+        Car newCar((std::string) car["model"].asString(),
+        (std::string) car["regNo"].asString(),
+        (float) car["condition"].asFloat(),
+        (bool) car["isRented"].asBool(),
+        (std::string) car["renterID"].asString(),
+        (std::string) car["dueDate"].asString());
+        Cars[newCar.getRegNo()] = newCar;
+    }
 }
 
-bool databaseExists(const string& filename) {
-    ifstream file(filename);
-    return file.good();
-}
+void God::exportData() {
 
-void createDatabase(const string& filename) {
-    sqlite3* db;
-    int rc = sqlite3_open(filename.c_str(), &db);
-    if (rc != SQLITE_OK) {
-        cerr << "Error creating SQLite database: " << sqlite3_errmsg(db) << endl;
-        sqlite3_close(db);
-        exit(1);
+    //use file handling to convert the data present in god class to convert to json file
+
+    Json::Value root;
+    Json::Value users;
+    Json::Value cars;
+
+    for (auto user : Users) {
+        Json::Value userNode;
+        userNode["name"] = user.se.getName();
+        userNode["ID"] = user.se.getID();
+        userNode["password"] = user.se.getPassword();
+        userNode["record"] = user.se.getRecord();
+        userNode["fine"] = user.se.getFine();
+        userNode["rentLimit"] = user.se.rentLimit;
+        userNode["memberType"] = user.se.memberType;
+
+        users.append(userNode);
     }
 
-    const char* createUsers = "CREATE TABLE Users (Name TEXT NOT NULL, ID TEXT NOT NULL PRIMARY KEY, Password TEXT NOT NULL, MemberType TEXT NOT NULL, Record REAL, Fine REAL, RentLimit INTEGER, RentedCars TEXT)";
-    if (executeQuery(db, createUsers) != SQLITE_OK) { 
-        cerr << "Error creating Users table." << endl;
-        sqlite3_close(db);
-        exit(1);
+    for (auto car : Cars) {
+        Json::Value carNode;
+
+        carNode["regNo"] = car.se.getRegNo();
+        carNode["model"] = car.se.getModel();
+        carNode["condition"] = car.se.getCondition();
+        carNode["isRented"] = car.se.getisRented();
+        carNode["renterID"] = car.se.getRenterID();
+        carNode["dueDate"] = car.se.getdueDate();
+
+        cars.append(carNode);
     }
 
+    root["users"] = users;
+    root["cars"] = cars;
+
+    ofstream file("db/data.json");
+    // ofstream file("db/sampledata.json");
     
-    const char* createCars = "CREATE TABLE Cars (Model TEXT, RegistrationNo TEXT PRIMARY KEY, Condition TEXT, isRented INTEGER, RenterID TEXT, RenterName TEXT, RenterType TEXT, DueDate TEXT)";
-    if (executeQuery(db, createCars) != SQLITE_OK) { 
-        cerr << "Error creating Car table." << endl;
-        sqlite3_close(db);
-        exit(1);
-    }
+    file << root;
+    file.close();
 
-    cout << "SQLite database and tables created successfully." << endl;
-    sqlite3_close(db);
 }
-
 
 
 #endif // DBF_H

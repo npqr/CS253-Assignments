@@ -4,7 +4,20 @@
 #include <iostream>
 #include <stdlib.h>
 #include <fstream>
-using namespace std;
+#include <string>
+#include <vector>
+#include <set>
+#include <map>
+
+#define cout std::cout
+#define cin std::cin
+#define endl std::endl
+#define ifstream std::ifstream
+#define ofstream std::ofstream
+#define cerr std::cerr
+
+#define fi first
+#define se second
 
 //// Environment Detection      //////////////////////////////////////
 
