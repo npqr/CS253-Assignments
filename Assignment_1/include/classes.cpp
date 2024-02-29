@@ -1,5 +1,5 @@
-#include "classes.h"
-#include "global.h"
+#include "classes.hpp"
+#include "global.hpp"
 
 //// God Class Functions          //////////////////////////////////////
 
@@ -29,13 +29,32 @@ void God::removeCar(Car &car) {
 
 void God::showAllUsers(std::string memberType) {
     for (auto user : Users) {
-        cout << dottedred;
         if(user.se.memberType == memberType ) {
-            cout << "Name  : " << user.se.getName() << "\t" << std::setw(29) << std::right << "ID : " << user.se.getID() << endl;
-            cout << "# Rented Cars : " << ANSI_COLOR_FG_GREEN << user.se.rentedCars.size() << ANSI_COLOR_RESET << "\t" << std::setw(29) << std::right << "Payment Due : " << ANSI_COLOR_FG_RED << user.se.due << ANSI_COLOR_RESET << endl;
-            cout << "Cars Rented : \n";
+            cout << dottedred;
+            cout << "Name          : " << acfy << std::left << std::setw(30) << user.se.getName() << "\t" 
+            << acr <<  std::right << std::setw(20) << "ID : " << std::left << acfy << std::right << std::setw(10) << user.se.getID() << acr << endl;
+
+            cout << "# Rented Cars : " << acfg << std::left << std::setw(30) << user.se.rentedCars.size() << "\t" 
+            << acr << std::right << std::setw(20) << "Payment Due : " << std::left << acfr << std::right << std::setw(10) << std::fixed << std::setprecision(2) << user.se.due << acr << endl;
+            
+            if(user.se.rentedCars.size() > 0) cout << "\nCars Rented : \n\n";
             for(auto car : user.se.rentedCars) {
-                cout << "Model : " << car.getModel() << "\t" << std::setw(29) << std::right << "Registration No. : " << car.getRegNo() << endl;
+                cout << "Model : " << acfy << std::left << std::setw(23) << car.getModel() << "\t"
+                << std::right << std::setw(21)  << acr << "Registration No. : " << acfy << std::setw(10) << car.getRegNo() << acr << endl;
+                cout << "Condition : " << acfg << std::left << std::setw(23);
+                
+                float cond = car.getCondition();
+        
+                if(cond < 30)
+                    cout << acfr;
+                else if(cond < 60)
+                    cout << acfy;
+                else
+                    cout << acfg;
+
+                cout << std::setprecision(2) << car.getCondition() << acr << "\t"
+                << std::right << std::setw(21) << acr << "Due Date : " << acfg << std::setw(10) << car.getDueDate() << acr << endl;
+                cout << endl;
             }
         }
     }
@@ -47,12 +66,24 @@ void God::showAllCars() {
         cout << dottedred;
         cout << "Registration No. : " << car.se.getRegNo() << "\n";
         cout << "Model : " << car.se.getModel() << "\n";
-        cout << "Condition : " << std::setprecision(2) << car.se.getCondition() << "\n";
+        
+        float cond = car.se.getCondition();
+        
+        cout << "Condition : " << std::setprecision(2);
+        if(cond < 30)
+            cout << acfr;
+        else if(cond < 60)
+            cout << acfy;
+        else
+            cout << acfg;
+
+        cout << car.se.getCondition() << acr << "\n";
+
         cout << "Rented : " << (car.se.getisRented() ? "YES" : "NO") << "\n";
         if(car.se.getisRented() == 1) {
         cout << "Renter ID : " << car.se.getRenterID() << "\n";
         cout << "Renter Name : " << Users[car.se.getRenterID()].getName() << "\n";
-        cout << "Due Date : " << car.se.getdueDate() << "\n";
+        cout << "Due Date : " << car.se.getDueDate() << "\n";
         }
     }
 }
@@ -62,16 +93,80 @@ void God::showAllCarsSecure() {
         cout << dottedred;
         cout << "Registration No. : " << car.se.getRegNo() << "\n";
         cout << "Model : " << car.se.getModel() << "\n";
-        cout << "Condition : " << std::setprecision(2) << car.se.getCondition() << "\n";
+        float cond = car.se.getCondition();
+        
+        cout << "Condition : " << std::setprecision(2);
+        if(cond < 30)
+            cout << acfr;
+        else if(cond < 60)
+            cout << acfy;
+        else
+            cout << acfg;
+
+        cout << car.se.getCondition() << acr << "\n";
         cout << "Available : " << ((car.se.getisRented() == 1)? "NO" : "YES") << "\n";
         if(car.se.getisRented() == 1) {
-            cout << "Expected Availability by : " << car.se.getdueDate() << "\n";
+            cout << "Expected Availability by : " << car.se.getDueDate() << "\n";
         }
     }
 }
 
 bool God::findUser(std::string ID) {
     return Users.find(ID) != Users.end();
+}
+
+bool God::findUserbyName(std::string name) {
+    for (auto user : Users) {
+        std::string s = user.se.getName();
+
+        transform(s.begin(), s.end(), s.begin(), ::toupper);
+        transform(name.begin(), name.end(), name.begin(), ::toupper);
+
+        if(s == name) {
+            return true;
+        }
+    }
+    return false;
+}
+
+User& God::getUserbyName(std::string name) {
+    for (auto user : Users) {
+        std::string s = user.se.getName();
+
+        transform(s.begin(), s.end(), s.begin(), ::toupper);
+        transform(name.begin(), name.end(), name.begin(), ::toupper);
+
+        if(s == name) {
+            return Users[user.se.getID()];
+        }
+    }
+}
+
+bool God::findCarbyModel(std::string model) {
+    for (auto car : Cars) {
+        std::string s = car.se.getModel();
+
+        transform(s.begin(), s.end(), s.begin(), ::toupper);
+        transform(model.begin(), model.end(), model.begin(), ::toupper);
+
+        if(s == model) {
+            return true;
+        }
+    }
+    return false;
+}
+
+Car& God::getCarbyModel(std::string model) {
+    for (auto car : Cars) {
+        std::string s = car.se.getModel();
+
+        transform(s.begin(), s.end(), s.begin(), ::toupper);
+        transform(model.begin(), model.end(), model.begin(), ::toupper);
+
+        if(car.se.getModel() == model) {
+            return Cars[car.se.getRegNo()];
+        }
+    }
 }
 
 bool God::findCar(std::string regNo) {
@@ -94,6 +189,15 @@ Car& God::getCar(std::string regNo) {
     return Cars[regNo];
 }
 
+std::map<std::string, User> God::getUsers() {
+    return Users;
+}
+
+std::map<std::string, Car> God::getCars() {
+    return Cars;
+}
+
+
 //// Car Class Functions          //////////////////////////////////////
 
 void Car::getDetails()  {
@@ -102,14 +206,14 @@ void Car::getDetails()  {
     cout << "Rented: " << (isRented ? "YES" : "NO") << endl;
     if(isRented) {
         cout << "Renter ID: " << renterID << endl;
-        cout << "Due Date: " << dueDate << endl;
+        cout << "Due Date: " << getDueDate() << endl;
     }
 }
 
 void Car::rentRequest(User& user) {
     isRented = true;
     renterID = user.getID();
-    cout << ANSI_COLOR_FG_GREEN << "Car rented successfully!" << endl;
+    cout << acfg << "Car rented successfully!" << endl;
     getDetails();
 }
 
@@ -127,7 +231,7 @@ void Car::returnRequest(User& user) {
 
 void User::rentCar(Car &car) {
     if (rentedCars.size() >= rentLimit) {
-        cout << ANSI_COLOR_FG_RED << "You have reached your rent limit." << endl;
+        cout << acfr << "You have reached your rent limit." << endl;
     } else {
         rentedCars.push_back(car);
     }
@@ -144,7 +248,7 @@ void User::returnCar(Car &car) {
 
 void User::showMyCars() {
     if(rentedCars.size() == 0) {
-        cout << ANSI_COLOR_FG_RED << "You have not rented any cars!" << endl;
+        cout << acfr << "You have not rented any cars!" << endl;
         
     } else {
         cout << "You have rented the following cars:" << endl;
@@ -154,8 +258,18 @@ void User::showMyCars() {
         cout << dottedred;
         cout << "Registration No. : " << car.getRegNo() << "\n";
         cout << "Model : " << car.getModel() << "\n";
-        cout << "Condition : " << std::setprecision(2) << car.getCondition() << "\n";
-        cout << "Due Date : " << car.getdueDate() << "\n";
+        float cond = car.getCondition();
+
+        cout << "Condition : " << std::setprecision(2);
+        if(cond < 30)
+            cout << acfr;
+        else if(cond < 60)
+            cout << acfy;
+        else
+            cout << acfg;
+
+        cout << car.getCondition() << acr << "\n";
+        cout << "Due Date : " << car.getDueDate() << "\n";
     }
 
     cout << dottedred;
@@ -175,9 +289,23 @@ void User::addRent(Car &car) {
 }
 
 void User::getDetails() {
-    cout << "Name  : " << name << "\t" << std::setw(29) << std::right << "ID : " << ID << endl;
-    cout << "# Rented Cars : " << ANSI_COLOR_FG_GREEN << rentedCars.size() << ANSI_COLOR_RESET << "\t" << std::setw(29) << std::right << "Payment Due : " << ANSI_COLOR_FG_RED << due << ANSI_COLOR_RESET << endl;
-    cout << ANSI_COLOR_FG_YELLOW << memberType << ANSI_COLOR_RESET << " Account" << "\t" << std::setw(29) << std::right << "Rent Limit : " << ANSI_COLOR_FG_GREEN << rentLimit << ANSI_COLOR_RESET << endl;
+    
+    cout << "Name          : " << acfy << std::left << std::setw(30) << name << "\t" 
+    << acr <<  std::right << std::setw(20) << "ID : " << std::left << acfy << std::right << std::setw(10) << ID << acr << endl;
+
+    cout << "# Rented Cars : " << acfg << std::left << std::setw(30) << rentedCars.size() << "\t" 
+    << acr << std::right << std::setw(20) << "Payment Due : " << std::left << acfr << std::right << std::setw(10) << std::fixed << std::setprecision(2) << due << acr << endl;
+    
+    cout << acfy << memberType  << acr << " Account" << std::left << std::setw(30) << "\t" 
+    << std::right << std::setw(15) <<  "Rent Limit : " << std::right << std::setw(10) << acfg << rentLimit << acr << endl;
+    cout << "Record        : ";
+    
+    if(record < 0)
+        cout << acfr;
+    else
+        cout << acfg;
+    
+    cout << std::fixed << std::setprecision(2) << record << acr << endl;
     cout << dottedred;
 }
 

@@ -1,10 +1,10 @@
 #ifndef CLASSES_H
 #define CLASSES_H
 
-#include "global.h"
-#include <iomanip>
+#include "global.hpp"
+#include <iomanip>                  // for std::setw
 
-//// Class Declarations           //////////////////////////////////////
+//// Class Declarations             //////////////////////////////////////
 
 class God;
 class User;
@@ -12,15 +12,71 @@ class Customer;
 class Employee;
 class Manager;
 class Car;
+class Date;
 
-//// User Class                  //////////////////////////////////////
+//// Date Class                   //////////////////////////////////////
+
+class Date {
+protected:
+    int day;
+    int month;
+    int year;
+
+public:
+    Date() : day(1), month(1), year(2001) {}
+
+    Date(int d, int m, int y) : day(d), month(m), year(y) {}
+
+    int getDay() const { return day; }
+    int getYear() const { return year; }
+    int getMonth() const { return month; }
+
+    void addDays(int daysToAdd) {
+        // Perform addition of days
+        day += daysToAdd;
+
+        // Handle overflow in days
+        while (day > daysInMonth()) {
+            day -= daysInMonth();
+            month++;
+            if (month > 12) {
+                month = 1;
+                year++;
+            }
+        }
+    }
+
+    int daysInMonth() const {
+        static const int days[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+        int daysOfMonth = days[month];
+        if (month == 2 && isLeapYear()) {
+            daysOfMonth = 29;
+        }
+        return daysOfMonth;
+    }
+
+    bool isLeapYear() const {
+        return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+    }
+
+    std::string getMonthName() const {
+        static const std::string monthNames[] = {"", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+        return monthNames[month];
+    }
+
+    void display() const {
+        cout << day << " " << getMonthName() << " " << year << endl;
+    }
+};
+
+//// User Class                     //////////////////////////////////////
 
 class User {
 protected:
     std::string name = "";    
     std::string ID = "";
     std::string password = "";
-    double record = 0.0;
+    double record = 75.0;
     double due = 0.0;
     std::vector<Car> rentedCars;
 
@@ -62,7 +118,7 @@ public:
 
 // Also add Help function
 
-//// Customer Class               //////////////////////////////////////
+//// Customer Class                 //////////////////////////////////////
 
 class Customer : public User {    
 public:
@@ -77,7 +133,7 @@ public:
     void getCustomerRecord () const { cout << "Customer record: " << record << endl; }
 };
 
-//// Employee Class               //////////////////////////////////////
+//// Employee Class                 //////////////////////////////////////
 
 class Employee : public User {
 
@@ -93,32 +149,45 @@ public:
     void getEmployeeRecord () const { cout << "Employee record: " << record << endl; }
 };
 
-//// Car Class                    //////////////////////////////////////
+//// Car Class                      //////////////////////////////////////
 
 class Car {
 protected:
     std::string model = "";
     std::string regNo = "";
-    float condition = 0.0;
+    float condition = 60.0;
     bool isRented = false;
     std::string renterID = "";
-    std::string dueDate = "";
-    float dailyRent = 0.0;
-    int expectedDays = 0;
+    Date rentDate = Date(1, 1, 2001);
+    float dailyRent = 1000.0;
+    int expectedDays = 5;
 
 public:
-
     Car() {};
 
-    Car(std::string model, std::string regNo, float condition, bool isRented, std::string renterID, std::string dueDate, float dailyRent, int expectedDays)
-        : model(model), regNo(regNo), condition(condition), isRented(isRented), renterID(renterID), dueDate(dueDate), dailyRent(dailyRent), expectedDays(expectedDays) {}
+    Car(std::string model, std::string regNo, float condition, bool isRented, std::string renterID, Date rentDate, float dailyRent, int expectedDays)
+        : model(model), regNo(regNo), condition(condition), isRented(isRented), renterID(renterID), rentDate(rentDate), dailyRent(dailyRent), expectedDays(expectedDays) {}
 
     std::string getModel() const { return model; }
     std::string getRegNo() const { return regNo; }
     float getCondition() const { return condition; }
     bool getisRented() const { return isRented; }
     std::string getRenterID() const { return renterID; }
-    std::string getdueDate() const { return dueDate; }
+    Date getRentDate() const {
+        return rentDate;
+    }
+    std::string getDueDate() const { 
+        Date rD = Date(rentDate.getDay(), rentDate.getMonth(), rentDate.getYear());
+        rD.addDays(expectedDays);
+
+        // cout << rD.getDay() << " " << rD.getMonthName() << ", " << rD.getYear() << endl;
+
+        return std::to_string(rD.getDay()) + " " + rD.getMonthName() + ", " + std::to_string(rD.getYear());
+    }
+
+    std::string getRentDateString() const {
+        return std::to_string(rentDate.getDay()) + "/" + std::to_string(rentDate.getMonth()) + "/" + std::to_string(rentDate.getYear());
+    }
 
     float getDailyRent() const { return dailyRent; }
     int getExpectedDays() const { return expectedDays; }
@@ -140,11 +209,16 @@ protected:
 
 public:
     bool findUser(std::string ID);
+    bool findUserbyName(std::string name);
+    User& getUserbyName(std::string name);
     bool findCar(std::string regNo);
 
     void addUser(User &user);
     void updateUser(User &user);
     void removeUser(User &user);
+
+    bool findCarbyModel(std::string model);
+    Car& getCarbyModel(std::string model);
 
     void addCar(Car &car);
     void updateCar(Car &car);
@@ -160,8 +234,12 @@ public:
     User& getUser(std::string ID);
     Car& getCar(std::string regNo);
 
+    std::map<std::string, User> getUsers();
+    std::map<std::string, Car> getCars();
+
     static void importData();
     static void exportData();
+    static void sanitizeData();
     
 };
 

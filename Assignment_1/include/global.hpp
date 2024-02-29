@@ -17,16 +17,18 @@
 #define ifstream std::ifstream
 #define ofstream std::ofstream
 #define cerr std::cerr
+#define getline std::getline
 
 #define fi first
 #define se second
 
 // #define dottedred "-------------------------------------------------------------\n"
-#define dottedred ANSI_COLOR_FG_RED << "\n::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n\n" << ANSI_COLOR_RESET
-#define dottedyellow ANSI_COLOR_FG_YELLOW << "\n::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n\n" << ANSI_COLOR_RESET
-#define dottedgreen ANSI_COLOR_FG_GREEN << "\n::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n\n" << ANSI_COLOR_RESET
+#define dotted "\n::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n\n" << acr
+#define dottedred acfr << dotted << acr
+#define dottedyellow acfy << dotted << acr
+#define dottedgreen acfg << dotted << acr
 
-//// Environment Detection      //////////////////////////////////////
+//// Environment Detection          //////////////////////////////////////
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
     #define PLATFORM_NAME "Windows" // Windows
@@ -48,11 +50,11 @@ const char *get_platform_name() {
     return PLATFORM_NAME;
 }
 
-//// Ansi Color Codes           //////////////////////////////////////
+//// Ansi Color Codes               //////////////////////////////////////
 
-#define ANSI_COLOR_FG_RED   "\x1b[31m"
-#define ANSI_COLOR_FG_GREEN "\x1b[32m"
-#define ANSI_COLOR_FG_YELLOW "\x1b[33m"
-#define ANSI_COLOR_RESET    "\x1b[0m"
+#define acfr "\x1b[31m"
+#define acfg "\x1b[32m"
+#define acfy "\x1b[33m"
+#define acr  "\x1b[0m"
 
 #endif // GLOBAL_H
