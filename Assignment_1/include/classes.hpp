@@ -50,6 +50,12 @@ class Date {
         return thisDays - otherDays;
     }
 
+    void operator= (const Date& other) {
+        day = other.day;
+        month = other.month;
+        year = other.year;
+    }
+
     int daysInMonth() const {
         static const int days[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
         int daysOfMonth = days[month];
@@ -77,38 +83,49 @@ class Date {
 
 class User {
    protected:
+
+   public:
     std::string name = "";
     std::string ID = "";
     std::string password = "";
     double record = 75.0;
     double due = 0.0;
-    std::vector<Car> rentedCars;
-
-   public:
+    std::vector<Car*> rentedCars;
     int rentLimit = 5;
 
     void getDues(int today);
     void clearDues() { due = 0.0; }
-    void rentCar(Car& car);
-    void returnCar(Car& car);
+    void rentCar(Car* car);
+    void returnCar(Car* car);
     void setRecord(double newRecord) { record = newRecord; }
 
     void showMyCars();
 
+    void operator= (const User* other) {
+        name = other->name;
+        ID = other->ID;
+        password = other->password;
+        record = other->record;
+        due = other->due;
+        rentedCars = other->rentedCars;
+    }
+
     double getRecord() const { return record; }
     double getDue() const { return due; }
-    std::vector<Car>& getRentedCars() { return rentedCars; }
+    std::vector<Car*> getRentedCars() { return rentedCars; }
     void addFine(double fine) { due += fine; }
-    void clearPartialDues(double amount) { addFine(-amount); }
+    void clearPartialDues(double amount) { addFine(-amount);}
 
-    void addRent(Car& car);
+    void addRent(Car* car);
     void calculateDue();
 
     std::string memberType = "";
 
     User(){};
 
-    User(const std::string& name, std::string ID, const std::string& password)
+    virtual ~User() {};
+
+    User(const std::string name, std::string ID, const std::string password)
         : name(name), ID(ID), password(password) {}
 
     std::string getName() const { return name; }
@@ -127,12 +144,12 @@ class User {
 
 class Customer : public User {
    public:
-    Customer(const std::string& name, std::string ID, const std::string& password)
+    Customer(const std::string name, std::string ID, const std::string password)
         : User(name, ID, password) {
         memberType = "Customer";
     }
 
-    Customer(){};
+    Customer() {};
 
     void getRentedCars();
     void getCustomerRecord() const { cout << "Customer record: " << record << endl; }
@@ -142,12 +159,12 @@ class Customer : public User {
 
 class Employee : public User {
    public:
-    Employee(const std::string& name, std::string ID, const std::string& password)
+    Employee(const std::string name, std::string ID, const std::string password)
         : User(name, ID, password) {
         memberType = "Employee";
     }
 
-    Employee(){};
+    Employee() {};
 
     void getRentedCars();
     void getEmployeeRecord() const { cout << "Employee record: " << record << endl; }
@@ -162,14 +179,14 @@ class Car {
     float condition = 60.0;
     bool isRented = false;
     std::string renterID = "";
-    Date rentDate = Date(1, 1, 2001);
+    Date rentDate = Date();
     float dailyRent = 1000.0;
     int expectedDays = 5;
 
    public:
     Car(){};
 
-    Car(std::string model, std::string regNo, float condition, bool isRented, std::string renterID, Date rentDate, float dailyRent, int expectedDays)
+    Car(std::string model, std::string regNo, float condition, bool isRented, std::string renterID, Date rentDate = Date(), float dailyRent = 1000.0, int expectedDays = 5)
         : model(model), regNo(regNo), condition(condition), isRented(isRented), renterID(renterID), rentDate(rentDate), dailyRent(dailyRent), expectedDays(expectedDays) {}
 
     std::string getModel() const { return model; }
@@ -177,9 +194,9 @@ class Car {
     float getCondition() const { return condition; }
     bool getisRented() const { return isRented; }
     std::string getRenterID() const { return renterID; }
-    Date getRentDate() const {
-        return rentDate;
-    }
+
+    Date getRentDate() { return rentDate; }
+
     std::string getDueDate() const {
         Date rD = Date(rentDate.getDay(), rentDate.getMonth(), rentDate.getYear());
         rD.addDays(expectedDays);
@@ -196,9 +213,22 @@ class Car {
     float getDailyRent() const { return dailyRent; }
     int getExpectedDays() const { return expectedDays; }
 
+    // void operator= (const Car& other) {
+    //     model = other.model;
+    //     regNo = other.regNo;
+    //     condition = other.condition;
+    //     isRented = other.isRented;
+    //     renterID = other.renterID;
+    //     rentDate = other.rentDate;
+    //     dailyRent = other.dailyRent;
+    //     expectedDays = other.expectedDays;
+    // }
+
     void getDetails();
-    void rentRequest(User& user);
-    void returnRequest(User& user);
+    void rentRequest(User* user);
+    void updateRentDate(Date date);
+    void updateExpectedDays(int newDays) { expectedDays = newDays; }
+    void returnRequest(User* user);
     void updateCondition(float newCondition) { condition = newCondition; }
 
     friend Manager;
@@ -208,25 +238,27 @@ class Car {
 
 class God {
    protected:
-    static std::map<std::string, User> Users;
-    static std::map<std::string, Car> Cars;
 
    public:
+    static std::map<std::string, User*> Users;
+    static std::map<std::string, Car*> Cars;
     bool findUser(std::string ID);
     bool findUserbyName(std::string name);
-    User& getUserbyName(std::string name);
+    User* getUserbyName(std::string name);
     bool findCar(std::string regNo);
 
-    void addUser(User& user);
-    void updateUser(User& user);
-    void removeUser(User& user);
+    God(){};
+
+    void addUser(User* user);
+    void updateUser(User* user);
+    void removeUser(User* user);
 
     bool findCarbyModel(std::string model);
-    Car& getCarbyModel(std::string model);
+    Car* getCarbyModel(std::string model);
 
-    void addCar(Car& car);
-    void updateCar(Car& car);
-    void removeCar(Car& car);
+    void addCar(Car* car);
+    void updateCar(Car* car);
+    void removeCar(Car* car);
 
     void showAllUsers(std::string memberType);
     void showAllCars();
@@ -235,11 +267,11 @@ class God {
     bool login(std::string ID, std::string password);
     void logout();
 
-    User& getUser(std::string ID);
-    Car& getCar(std::string regNo);
+    User* getUser(std::string ID);
+    Car* getCar(std::string regNo);
 
-    std::map<std::string, User> getUsers();
-    std::map<std::string, Car> getCars();
+    std::map<std::string, User*> getUsers();
+    std::map<std::string, Car*> getCars();
 
     static void importData();
     static void exportData();
@@ -253,7 +285,7 @@ class Manager : public User, public God {
    public:
     Manager(){};
 
-    Manager(const std::string& name, std::string ID, const std::string& password)
+    Manager(const std::string name, std::string ID, const std::string password)
         : User(name, ID, password), God() {
         memberType = "Manager";
     }
