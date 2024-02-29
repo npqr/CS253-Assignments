@@ -24,17 +24,37 @@ void God::importData() {
         newUser.rentLimit = user["rentLimit"].asInt();
         newUser.memberType = user["memberType"].asString();
         newUser.record = user["record"].asDouble();
-        newUser.fine = user["fine"].asDouble();
+        newUser.due = user["due"].asDouble();
+
+        for (auto car : user["rentedCars"]) {
+            Car newCar(
+            (std::string) car["model"].asString(),
+            (std::string) car["regNo"].asString(),
+            (float) car["condition"].asFloat(),
+            (bool) car["isRented"].asBool(),
+            (std::string) car["renterID"].asString(),
+            (std::string) car["dueDate"].asString(),
+            (float) car["dailyRent"].asFloat(),
+            (int) car["expectedDays"].asInt()
+            );
+            newUser.rentedCars.push_back(newCar);
+        }
+
         Users[newUser.getID()] = newUser;
     }
 
     for (auto car : root["cars"]) {
-        Car newCar((std::string) car["model"].asString(),
+        Car newCar(
+        (std::string) car["model"].asString(),
         (std::string) car["regNo"].asString(),
         (float) car["condition"].asFloat(),
         (bool) car["isRented"].asBool(),
         (std::string) car["renterID"].asString(),
-        (std::string) car["dueDate"].asString());
+        (std::string) car["dueDate"].asString(),
+        (float) car["dailyRent"].asFloat(),
+        (int) car["expectedDays"].asInt()
+        );
+        
         Cars[newCar.getRegNo()] = newCar;
     }
 }
@@ -53,9 +73,24 @@ void God::exportData() {
         userNode["ID"] = user.se.getID();
         userNode["password"] = user.se.getPassword();
         userNode["record"] = user.se.getRecord();
-        userNode["fine"] = user.se.getFine();
+        userNode["due"] = user.se.getDue();
         userNode["rentLimit"] = user.se.rentLimit;
         userNode["memberType"] = user.se.memberType;
+
+        Json::Value rc;
+        userNode["rentedCars"] = Json::Value(Json::arrayValue);
+        for (auto car : user.se.rentedCars) {
+            rc["model"] = car.getModel();
+            rc["regNo"] = car.getRegNo();
+            rc["condition"] = car.getCondition();
+            rc["isRented"] = car.getisRented();
+            rc["renterID"] = car.getRenterID();
+            rc["dueDate"] = car.getdueDate();
+            rc["dailyRent"] = car.getDailyRent();
+            rc["expectedDays"] = car.getExpectedDays();
+
+            userNode["rentedCars"].append(rc);
+        }
 
         users.append(userNode);
     }
@@ -63,12 +98,14 @@ void God::exportData() {
     for (auto car : Cars) {
         Json::Value carNode;
 
-        carNode["regNo"] = car.se.getRegNo();
         carNode["model"] = car.se.getModel();
+        carNode["regNo"] = car.se.getRegNo();
         carNode["condition"] = car.se.getCondition();
         carNode["isRented"] = car.se.getisRented();
         carNode["renterID"] = car.se.getRenterID();
         carNode["dueDate"] = car.se.getdueDate();
+        carNode["dailyRent"] = car.se.getDailyRent();
+        carNode["expectedDays"] = car.se.getExpectedDays();
 
         cars.append(carNode);
     }

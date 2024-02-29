@@ -8,6 +8,8 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <algorithm>
+
 
 #define cout std::cout
 #define cin std::cin
@@ -18,6 +20,11 @@
 
 #define fi first
 #define se second
+
+// #define dottedred "-------------------------------------------------------------\n"
+#define dottedred ANSI_COLOR_FG_RED << "\n::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n\n" << ANSI_COLOR_RESET
+#define dottedyellow ANSI_COLOR_FG_YELLOW << "\n::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n\n" << ANSI_COLOR_RESET
+#define dottedgreen ANSI_COLOR_FG_GREEN << "\n::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n\n" << ANSI_COLOR_RESET
 
 //// Environment Detection      //////////////////////////////////////
 
@@ -43,7 +50,9 @@ const char *get_platform_name() {
 
 //// Ansi Color Codes           //////////////////////////////////////
 
-#define ANSI_COLOR_RED     "\x1b[31m"
-#define ANSI_COLOR_RESET   "\x1b[0m"
+#define ANSI_COLOR_FG_RED   "\x1b[31m"
+#define ANSI_COLOR_FG_GREEN "\x1b[32m"
+#define ANSI_COLOR_FG_YELLOW "\x1b[33m"
+#define ANSI_COLOR_RESET    "\x1b[0m"
 
 #endif // GLOBAL_H

@@ -2,6 +2,7 @@
 #define CLASSES_H
 
 #include "global.h"
+#include <iomanip>
 
 //// Class Declarations           //////////////////////////////////////
 
@@ -20,23 +21,27 @@ protected:
     std::string ID = "";
     std::string password = "";
     double record = 0.0;
-    double fine = 0.0;
+    double due = 0.0;
     std::vector<Car> rentedCars;
 
 public:
-    int rentLimit = 0;
+    int rentLimit = 5;
     
     void getDues(int today);
-    void clearDue() { fine = 0.0; }
+    void clearDues() { due = 0.0; }
     void rentCar(Car &car);
     void returnCar(Car &car);
+    void setRecord(double newRecord) { record = newRecord; }
 
     void showMyCars();
 
     double getRecord() const { return record; }
-    double getFine() const { return fine; }
+    double getDue() const { return due; }
+    std::vector<Car>& getRentedCars() { return rentedCars; }
+    void addFine(double fine) { due += fine; }
 
-    // void Logout();
+    void addRent(Car &car);
+    void calculateDue();
 
     std::string memberType = "";
 
@@ -49,17 +54,10 @@ public:
     std::string getID() const { return ID; }
     std::string getPassword() const { return password; }
     
-    void getDetails() const {
-        cout << "Name: " << name << "\t\t ID : " << ID << endl;
-        cout << "Member Type: " << memberType << "\tToday's Date : 01/01/2021\n";
-        cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-    }
+    void getDetails();
     
     friend Manager;
     friend God;
-
-    void fetchDB(std::string ID);
-    void updateDB(std::string ID);
 };
 
 // Also add Help function
@@ -72,6 +70,8 @@ public:
         : User(name, ID, password) {
         memberType = "Customer";
     }
+
+    Customer() {};
 
     void getRentedCars();
     void getCustomerRecord () const { cout << "Customer record: " << record << endl; }
@@ -87,6 +87,8 @@ public:
         memberType = "Employee";
     }
 
+    Employee () {};
+
     void getRentedCars();
     void getEmployeeRecord () const { cout << "Employee record: " << record << endl; }
 };
@@ -101,13 +103,15 @@ protected:
     bool isRented = false;
     std::string renterID = "";
     std::string dueDate = "";
+    float dailyRent = 0.0;
+    int expectedDays = 0;
+
 public:
 
     Car() {};
 
-    Car(std::string model, std::string regNo, float condition, bool isRented, std::string renterID, std::string dueDate)
-        : model(model), regNo(regNo), condition(condition), isRented(isRented), renterID(renterID), dueDate(dueDate) {}
-
+    Car(std::string model, std::string regNo, float condition, bool isRented, std::string renterID, std::string dueDate, float dailyRent, int expectedDays)
+        : model(model), regNo(regNo), condition(condition), isRented(isRented), renterID(renterID), dueDate(dueDate), dailyRent(dailyRent), expectedDays(expectedDays) {}
 
     std::string getModel() const { return model; }
     std::string getRegNo() const { return regNo; }
@@ -116,29 +120,13 @@ public:
     std::string getRenterID() const { return renterID; }
     std::string getdueDate() const { return dueDate; }
 
-    void showDueDate() const {
-        cout << "Due date: " << dueDate << endl;
-    }
+    float getDailyRent() const { return dailyRent; }
+    int getExpectedDays() const { return expectedDays; }
 
-    void getDetails() const {
-        cout << "Model: " << model << endl;
-        cout << "Condition: " << condition << endl;
-        cout << "Rented: " << (isRented ? "Yes" : "No") << endl;
-    }
-
-    void rentRequest(const User& user) {
-        if (isRented) {
-            cout << "Car is already rented." << endl;
-        } else {
-            isRented = true;
-            renterID = user.getID();
-            cout << "Car rented successfully." << endl;
-            getDetails();
-        }
-    }
-
-    void fetchDB();
-    void updateDB();
+    void getDetails();
+    void rentRequest(User& user);
+    void returnRequest(User& user);
+    void updateCondition(float newCondition) { condition = newCondition; }
 
     friend Manager;
 };
@@ -147,8 +135,8 @@ public:
 
 class God {
 protected:
-    std::map<std::string, User> Users;
-    std::map<std::string, Car> Cars;
+    static std::map<std::string, User> Users;
+    static std::map<std::string, Car> Cars;
 
 public:
     bool findUser(std::string ID);
@@ -162,8 +150,9 @@ public:
     void updateCar(Car &car);
     void removeCar(Car &car);
 
-    void showAllUsers();
+    void showAllUsers(std::string memberType);
     void showAllCars();
+    void showAllCarsSecure();
 
     bool login(std::string ID, std::string password);
     void logout();
@@ -171,20 +160,20 @@ public:
     User& getUser(std::string ID);
     Car& getCar(std::string regNo);
 
-    void importData();
-    void exportData();
+    static void importData();
+    static void exportData();
     
 };
 
 //// Manager Class                //////////////////////////////////////
 
-class Manager : public User {
+class Manager : public User, public God {
 protected:
 public:
     Manager () {};
 
     Manager(const std::string& name, std::string ID, const std::string& password)
-        : User(name, ID, password) {
+        : User(name, ID, password), God() {
         memberType = "Manager";
     }
 };
