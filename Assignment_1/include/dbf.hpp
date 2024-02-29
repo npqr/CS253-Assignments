@@ -4,9 +4,9 @@
 //// Database Functions             //////////////////////////////////////
 
 #include "classes.hpp"
-#include "jsoncpp/json/json.h"
-#include "jsoncpp/json/json-forwards.h"
 #include "global.hpp"
+#include "jsoncpp/json/json-forwards.h"
+#include "jsoncpp/json/json.h"
 
 // Support for JSON from https://github.com/open-source-parsers/jsoncpp
 
@@ -24,7 +24,6 @@ void extractDate(const std::string& dateString, int& day, int& month, int& year)
 }
 
 void God::importData() {
-
     Json::Value root;
     ifstream file("db/data.json");
     file >> root;
@@ -32,9 +31,9 @@ void God::importData() {
 
     for (auto user : root["users"]) {
         User newUser(
-        (std::string) user["name"].asString(),
-        (std::string) user["ID"].asString(), 
-        (std::string) user["password"].asString());
+            (std::string)user["name"].asString(),
+            (std::string)user["ID"].asString(),
+            (std::string)user["password"].asString());
         newUser.rentLimit = user["rentLimit"].asInt();
         newUser.memberType = user["memberType"].asString();
         newUser.record = user["record"].asDouble();
@@ -42,24 +41,23 @@ void God::importData() {
 
         for (auto car : user["rentedCars"]) {
             int d, m, y;
-            if(car["rentDate"].asString() == "") {
+            if (car["rentDate"].asString() == "") {
                 d = 1;
                 m = 1;
                 y = 2001;
             }
 
-            extractDate((std::string) car["rentDate"].asString(), d, m, y);
+            extractDate((std::string)car["rentDate"].asString(), d, m, y);
 
             Car newCar(
-            (std::string) car["model"].asString(),
-            (std::string) car["regNo"].asString(),
-            (float) car["condition"].asFloat(),
-            (bool) car["isRented"].asBool(),
-            (std::string) car["renterID"].asString(),
-            Date (d, m, y),
-            (float) car["dailyRent"].asFloat(),
-            (int) car["expectedDays"].asInt()
-            );
+                (std::string)car["model"].asString(),
+                (std::string)car["regNo"].asString(),
+                (float)car["condition"].asFloat(),
+                (bool)car["isRented"].asBool(),
+                (std::string)car["renterID"].asString(),
+                Date(d, m, y),
+                (float)car["dailyRent"].asFloat(),
+                (int)car["expectedDays"].asInt());
             newUser.rentedCars.push_back(newCar);
         }
 
@@ -68,31 +66,29 @@ void God::importData() {
 
     for (auto car : root["cars"]) {
         int d, m, y;
-        if(car["rentDate"].asString() == "") {
+        if (car["rentDate"].asString() == "") {
             d = 1;
             m = 1;
             y = 2001;
         }
 
-        extractDate((std::string) car["rentDate"].asString(), d, m, y);
-        
+        extractDate((std::string)car["rentDate"].asString(), d, m, y);
+
         Car newCar(
-        (std::string) car["model"].asString(),
-        (std::string) car["regNo"].asString(),
-        (float) car["condition"].asFloat(),
-        (bool) car["isRented"].asBool(),
-        (std::string) car["renterID"].asString(),
-        Date (d, m, y),
-        (float) car["dailyRent"].asFloat(),
-        (int) car["expectedDays"].asInt()
-        );
-        
+            (std::string)car["model"].asString(),
+            (std::string)car["regNo"].asString(),
+            (float)car["condition"].asFloat(),
+            (bool)car["isRented"].asBool(),
+            (std::string)car["renterID"].asString(),
+            Date(d, m, y),
+            (float)car["dailyRent"].asFloat(),
+            (int)car["expectedDays"].asInt());
+
         Cars[newCar.getRegNo()] = newCar;
     }
 }
 
 void God::exportData() {
-
     Json::Value root;
     Json::Value users;
     Json::Value cars;
@@ -144,10 +140,9 @@ void God::exportData() {
     root["cars"] = cars;
 
     ofstream file("db/data.json");
-    
+
     file << root;
     file.close();
-
 }
 
-#endif // DBF_H
+#endif  // DBF_H
