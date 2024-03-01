@@ -1,14 +1,14 @@
 <center><strong><h1>CaR-e-MaSys v1.0</h1></strong></center>
 
 ```
-::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-::           _________ _________  ____ ___  ____ ________  _______          ::
-::          / ___/ __ `/ ___/ _ \/ __ `__ \/ __ `/ ___/ / / / ___/          ::
-::         / /__/ /_/ / /  /  __/ / / / / / /_/ (__  / /_/ (__  )           ::
-::         \___/\__,_/_/   \___/_/ /_/ /_/\__,_/____/\__, /____/            ::
-::                                                  /____/                  ::
-::                                                                     v1.0 ::
-::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    ::           _________ _________  ____ ___  ____ ________  _______          ::
+    ::          / ___/ __ `/ ___/ _ \/ __ `__ \/ __ `/ ___/ / / / ___/          ::
+    ::         / /__/ /_/ / /  /  __/ / / / / / /_/ (__  / /_/ (__  )           ::
+    ::         \___/\__,_/_/   \___/_/ /_/ /_/\__,_/____/\__, /____/            ::
+    ::                                                  /____/                  ::
+    ::                                                                     v1.0 ::
+    ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ```
 
 ## Setup Instructions :
@@ -29,13 +29,13 @@
 ## Structure
 
 - The project is organised into following files housing the respective components :
-    - `classes.hpp` : Contains the declarations for all the classes
-    - `classes.cpp` : Contains the definitions for classes, functions and other methods included in `classes.hpp`
-    - `dbf.hpp` : Contains the required functions for file-handling (the databased is encoded in JSON and then retrieved as well)
-    - `global.hpp` :     Contains some essential functions and macros required
-    - `help.hpp` : Houses few helper functions, mostly semantic purposes
-    - `jsoncpp` : Houses the amalgamated library for parsing and interconversion of JSON Values (Source : [jsoncpp](https://github.com/open-source-parsers/jsoncpp))
-    - `main.cpp` : It includes the above files and houses the core functionalities of the application
+    - [`classes.hpp`](include/classes.hpp) : Contains the declarations for all the classes
+    - [`classes.cpp`](include/classes.cpp) : Contains the definitions for classes, functions and other methods included in `classes.hpp`
+    - [`dbf.hpp`](include/dbf.hpp) : Contains the required functions for file-handling (the databased is encoded in JSON and then retrieved as well)
+    - [`global.hpp`](include/global.hpp) :     Contains some essential functions and macros required
+    - [`help.hpp`](include/help.hpp) : Houses few helper functions, mostly semantic purposes
+    - [`jsoncpp`](include/jsoncpp/) : Houses the amalgamated library for parsing and interconversion of JSON Values (Source : [jsoncpp](https://github.com/open-source-parsers/jsoncpp))
+    - [`main.cpp`](main.cpp) : It includes the above files and houses the core functionalities of the application
 
 ## Conventions
 
@@ -57,7 +57,7 @@
 - The maximum days for which a car can be rented is 15
 - The maximum number of cars that can be rented by a customer at a time is by-default (RentLimit), which can be altered
 - The database, as stored in a JSON file, is encoded in a specific manner, and thus, the file should not be tampered with manually. Othewise, the system may crash
-- By-default, record of each Customer and Employee is initialised a `75.9` which is updated as and whem the user pays dues, returns the car, etc depending on the car condition and other factors
+- By-default, record of each Customer and Employee is initialised a `75.0` which is updated as and whem the user pays dues, returns the car, etc depending on the car condition and other factors
 - It is assumed that the condition of car can not be more than what it was initially, except when updated by the Manager (simiulating repair)
 - The login credentials are case-sensitive. Also, they can be accessed directly from the JSON file. A hashing mechanism can be implemented, though
 - Note : Abrupt termination of the program may lead to loss of data, as the data is stored in a JSON file, and is updated as and when the program is run
