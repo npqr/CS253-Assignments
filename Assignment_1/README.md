@@ -14,7 +14,7 @@
 ## Setup Instructions :
 
 1. Clone this repo
-2. If you are on a Linux machine, run the bash script `./run.sh`, while Windows users can run the powershell script `.\run.ps1`, or alternatively :
+2. If you are on a Linux machine, run the `bash` script `./run.sh`, while Windows users can run the `ps` script `.\run.ps1`, or alternatively
 
     ```
     g++ -o main main.cpp ./include/jsoncpp/jsoncpp.cpp
