@@ -1,140 +1,50 @@
-<center><strong><h1>Assignment 1: Car Rental System in C++</h1></strong></center>
+<center><strong><h1>CaR-e-MaSys v1.0</h1></strong></center>
 
-<center><h3>CS253 – 2024, IIT Kanpur</h3></center>
-
-You are required to implement a car rental system in C++ language using **Object-Oriented Programming concepts**. Implement the system on command line interface.
-
-List of basic functionalities:
-
-1. Keep records of cars rented per customer/employee.
-
-2. A customer is given a car if his/her `customer_record` is good enough. A `customer_record` is updated based on several factors:
-
-    a. Car returned later than `return_date`.
-
-    b. Damage caused to the car. The condition in which the car has been returned.
-
-    c. The same will be for employees i.e. `employee_record`.
-
-3. Maintain different databases for customers, employees, and cars.
-
-4. Maintain three different classes for customers, employees, and manager.
-
-    a. A **customer** can see all the available cars. Can browse all the cars he is currently renting. Can rent a limited number of cars as per his/her `customer_record`. (Optional: If a customer is new, register him with an average `customer_record` value). A fine will be imposed per day from the day of return.
-
-    b. An **employee** can see all the available cars. Can browse all the cars he/she is currently renting. Can rent a limited number of cars as per his/her employee_record. They are given a 15% discount on all cars. A fine will be imposed per day from the day of return.
-
-    c. A **manager** can add/update/delete any customer or employee. Can also update/delete/add cars in the store. Can see all the cars and who they are rented to.
-
-5. Every method must be present in its appropriate class. Try to make use of both the private and public functionalities for attributes. Prudently use inheritance, polymorphism, data abstraction, and other concepts of OOPs. Start with atleast 5 cars, 5 customers, 5 employees and 1 manager. Feel free to choose **default value(s)** for other parameters.
-
-6. For reference, you can check out the block diagram given on the next page.
-
-
-Your project will be tested on edge cases (for example, one cannot rent if there is no car available) and overall, how complex as well as efficient your code is. *Be careful of plagiarism, if found, will be treated severely.* 
-
-
-***Note:*** You can use File Handling through C++ [[1]](https://www.geeksforgeeks.org/file-handling-c-classes/). Or can use local databases like MySQL [[2]](https://www.geeksforgeeks.org/how-to-setup-mysql-database-in-visual-studio-2022-for-a-cpp-application/), MongoDB [[3]](https://www.mongodb.com/developer/products/mongodb/getting-started-mongodb-cpp/) *(relatively easy)*, etc. Although, you will not be judged based on your DB management skills rather your
-implementation and understanding of <ins>concepts of OOPs</ins>.
-
-Figure 1 : All the databases
-```mermaid
-classDiagram
-    class Car Database{
-        List of Cars
-
-        Add()
-        Update()
-        Delete()
-        Search()
-    }
-
-    class Customer Database{
-        List of Users
-
-        Add()
-        Update()
-        Delete()
-        Search()
-    }
-
-    class Employee Database{
-        List of Users
-
-        Add()
-        Update()
-        Delete()
-        Search()
-    }
-
-    CarDatabase --|> Car
-    class Car {
-        Model
-        Condition
-        Other Details
-
-        RentRequest()
-        ShowDueDate()
-    }
-
-    CustomerDatabase --|> Customer
-    class Customer {
-        ID
-        Rented cars
-        Fine due
-        customer_record
-        Other details
-
-        ClearDue()
-    }
-
-    EmployeeDatabase --|> Employee
-    class Employee {
-        ID
-        Rented cars
-        Fine due
-        customer_record
-        Other details
-
-        ClearDue()
-
-    }
+```
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::           _________ _________  ____ ___  ____ ________  _______          ::
+::          / ___/ __ `/ ___/ _ \/ __ `__ \/ __ `/ ___/ / / / ___/          ::
+::         / /__/ /_/ / /  /  __/ / / / / / /_/ (__  / /_/ (__  )           ::
+::         \___/\__,_/_/   \___/_/ /_/ /_/\__,_/____/\__, /____/            ::
+::                                                  /____/                  ::
+::                                                                     v1.0 ::
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ```
 
+## Setup Instructions :
 
-Figure 2: List of customers and employees
+1. Clone this repo
+2. If you are on a Linux machine, run the bash script `./run.sh`, while Windows users can run the powershell script `.\run.ps1`, or alternatively :
 
-```mermaid
+    ```
+    g++ -o main main.cpp ./include/jsoncpp/jsoncpp.cpp
+    ./main
+    ```
 
-classDiagram
-    class User{
-        Name
-        ID
-        Password
+3. After running `.\run` once, you can continue with `.\run 1` to run the program than compiling again everytime
 
-        
-    }
+## Application Structure
 
-    User <|-- Customer
-    class Customer {
-        
+- The project is organised into following files housing the respective components :
+    - `classes.hpp` : Contains the declarations for all the classes
+    - `classes.cpp` : Contains the definitions for classes, functions and other methods included in `classes.hpp`
+    - `dbf.hpp` : Contains the required functions for file-handling (the databased is encoded in JSON and then retrieved as well)
+    - `global.hpp` :     Contains some essential functions and macros required
+    - `help.hpp` : Houses few helper functions, mostly semantic purposes
+    - `jsoncpp` : Houses the amalgamated library for parsing and interconversion of JSON Values (Source : [jsoncpp](https://github.com/open-source-parsers/jsoncpp))
+    - `main.cpp` : It includes the above files and houses the core functionalities of the application
 
-        ReturnRequest()
-    }
+## Methodologies and Conventions
 
-
-    User <|-- Employee
-    class Employee {
-       
-
-        ReturnRequest()
-
-    }
-
-    User <|-- Manager
-    class Manager {
-         
-
-        ModifyRecords()
-    }
-```
+- Initially the system is equipped with 5 Cars, 5 Customers, 5 Employees and 1 Manager
+- There are different databases (`static` maps of `Customers*`, `Employees*` and `Cars*`) for Customers, Employees and Cars. All of these are housed in a separated class `God`, which also contains various functions required for the overall functionality
+- The `Customer`, `Employee` and `Manager` classes are derived from the `User` class
+- A Registration-Login System is implemented. New Users (Customers/Employees) can register themselves too
+- The Manager can also create accounts, if needed
+- Credentials of the Manager are `ID : peter101`, `password : ilu3000`
+- The Manager cannot be deleted, also, only one Manager is implemented by-default; although creation of another Manager can be done easily, but it is not deemed that beneficial
+- A search mechanism based on substrings has been implemented
+- A simple date-parsing mechanism has been applied (with another class dedicated for that) and thus, dates can be handled in the system
+- It is expected that input is fed without spaces, although `getline` takes care for `Name`, `Model` and similar attributes that can have spaces
+- The User is presented with a menu with various options to choose from, as well as a Dashboard is displayed too
+- At various instances, ANSI Escape Sequences are used for colour manipulation in the CLI
