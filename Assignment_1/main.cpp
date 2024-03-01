@@ -8,10 +8,10 @@
 
 //// Login Function                 //////////////////////////////////////
 
-void Login(God* God, User* currentUser, bool& isRunning) {
+void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
     clearScreen();
 
-    God->importData();
+    DBMgr->importData();
 
     cout << "Welcome to " << acfg << "CaR-e-MaSyS!\n"
          << acr;
@@ -19,7 +19,6 @@ void Login(God* God, User* currentUser, bool& isRunning) {
          << acfg << "register (r)" << acr << " or " << acfy << "login (l)" << acr << " or " << acfr << "quit (q)? : " << acr;
 
     std::string action, role;
-
 
     while ((action[0] != 'r') || (action[0] != 'l') || (action[0] != 'q') || (action[0] != 'R') || (action[0] != 'L') || (action[0] != 'Q')) {
         cin >> (action);
@@ -56,8 +55,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
             // Registration
             std::string Name, ID, password;
             cout << "Hi! Please Enter your Name: " << endl;
-            cin.ignore();
-            getline(cin, Name);
+            cin >> (Name);
 
             bool unique_ID = false;
             while (unique_ID == false) {
@@ -73,7 +71,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
 
                 // check if ID already exists
 
-                if (God->findUser(ID) == true) {
+                if (DBMgr->findUser(ID) == true) {
                     cerr << "ID '" << ID << "' already exists. Please choose a different ID." << endl;
                 } else {
                     unique_ID = true;
@@ -84,19 +82,19 @@ void Login(God* God, User* currentUser, bool& isRunning) {
             password = getPassword();
 
             if (role[0] == 'c' || role[0] == 'C') {
-                Customer* newUser = new Customer(Name, ID, password);
-                God->addCustomer(newUser);
+                Customer nC(Name, ID, password);
+                DBMgr->addCustomer(&nC);
             } else if (role[0] == 'e' || role[0] == 'E') {
-                Employee* newUser = new Employee(Name, ID, password);
-                God->addEmployee(newUser);
+                Employee nE(Name, ID, password);
+                DBMgr->addEmployee(&nE);
             }
 
-            currentUser = God->getUser(ID);
+            currentUser = DBMgr->getUser(ID);
 
             cout << "You have successfully registered as " << ((role[0] == 'c' || role[0] == 'C') ? "a Customer" : "an Employee") << "!\n";
 
-            God->exportData();
-            God->importData();
+            DBMgr->exportData();
+            DBMgr->importData();
 
             break;
         } else if (action[0] == 'l' || action[0] == 'L') {
@@ -106,8 +104,8 @@ void Login(God* God, User* currentUser, bool& isRunning) {
 
             while (auth != true) {
                 cout << "Enter your ID: " << endl;
-                cin.ignore();
-                getline(cin, ID);
+
+                cin >> (ID);
                 // ID = "peter101";
 
                 if (cin.fail()) {
@@ -122,16 +120,16 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                 // password = "gg";
 
                 clearScreen();
-                auth = God->login(ID, password);
+                auth = DBMgr->login(ID, password);
 
                 if (auth != true) cout << acfr << "Invalid ID or password! Please try again.\n"
                                        << acr;
             }
 
-            currentUser = God->getUser(ID);
+            currentUser = DBMgr->getUser(ID);
 
             std::string rolee = currentUser->memberType;
-            
+
             if (rolee == "Customer")
                 role = "c";
             else if (rolee == "Employee")
@@ -149,11 +147,10 @@ void Login(God* God, User* currentUser, bool& isRunning) {
         }
     }
 
-    God->exportData();
-    God->importData();
+    DBMgr->exportData();
+    DBMgr->importData();
 
     // Main menu
-    
 
     if (role[0] == 'c' || role[0] == 'e') {
         int choice;
@@ -194,9 +191,10 @@ void Login(God* God, User* currentUser, bool& isRunning) {
             switch (choice) {
                 case 1: {
                     // Browse & Rent
+                    int flag = 2;
 
                     cout << "All cars available : " << endl;
-                    God->showAllCarsSecure();
+                    DBMgr->showAllCarsSecure();
 
                     cout << dottedred;
 
@@ -211,11 +209,10 @@ void Login(God* God, User* currentUser, bool& isRunning) {
 
                         std::transform(regNo.begin(), regNo.end(), regNo.begin(), ::toupper);
 
-                        if (God->findCar(regNo)) {
+                        if (DBMgr->findCar(regNo)) {
+                            Car* car = DBMgr->getCar(regNo);
 
-                            Car* car = God->getCar(regNo);
-
-                            if (currentUser->getRecord() < 0) {
+                            if ((currentUser->getRecord() < 0)) {
                                 cout << acfr << "You have a negative record. You cannot rent a car->" << endl;
                                 pak2c();
                                 break;
@@ -229,36 +226,40 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                             int dd, mm, yyyy;
                             cin >> dd >> mm >> yyyy;
 
+                            if (dd < 1 || dd > 31 || mm < 1 || mm > 12 || yyyy < 2020 || yyyy > 2026) {
+                                cout << acfr << "Invalid date!" << acr << "Please recheck details." << endl;
+                                pak2c();
+                                break;
+                            }
+
                             cout << "Enter the number of days you want to rent the car for: ";
                             int days;
                             cin >> days;
 
+                            if (days < 0 || days > 15) {
+                                cout << acfr << "Invalid number of days!" << acr << "Please recheck details." << endl;
+                                cout << "Note : \tYou can rent a car for a maximum of 15 days." << endl;
+                                pak2c();
+                                break;
+                            }
+
                             Date rentDate = Date(dd, mm, yyyy);
 
                             car->rentRequest(currentUser);
+
                             car->updateRentDate(rentDate);
                             car->updateExpectedDays(days);
 
                             // car->getDetails();
-                            
-                            God->updateCar(car);
+
+                            DBMgr->updateCar(car);
 
                             currentUser->rentCar(car);
                             currentUser->addRent(car);
-
-                            if(role[0] == 'c') 
-                            {
-                                Customer* c = dynamic_cast<Customer*>(currentUser);
-                                God->updateCustomer(c);
-                            }
-                            else if(role[0] == 'e')
-                            {
-                                Employee* e = dynamic_cast<Employee*>(currentUser);
-                                God->updateEmployee(e);
-                            }
+                            DBMgr->updateUser(currentUser);
 
                             cout << dottedgreen;
-                            God->getCar(regNo)->getDetails();
+                            DBMgr->getCar(regNo)->getDetails();
                             cout << dottedgreen;
 
                         } else {
@@ -266,18 +267,18 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         }
                     }
 
-                    God->exportData();
-                    God->importData();
+                    DBMgr->exportData();
+                    DBMgr->importData();
 
                     pak2c();
                     break;
                 }
                 case 2: {
                     cout << "Rented cars: " << endl;
-                    currentUser->showMyCars(God);
+                    currentUser->showMyCars(DBMgr);
 
-                    God->exportData();
-                    God->importData();
+                    DBMgr->exportData();
+                    DBMgr->importData();
 
                     pak2c();
                     break;
@@ -293,7 +294,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                     cin >> (rent);
 
                     if (rent[0] == 'y' || rent[0] == 'Y') {
-                        currentUser->showMyCars(God);
+                        currentUser->showMyCars(DBMgr);
                         pak2c();
                     }
 
@@ -302,8 +303,8 @@ void Login(God* God, User* currentUser, bool& isRunning) {
 
                     std::transform(regNo.begin(), regNo.end(), regNo.begin(), ::toupper);
 
-                    if (God->findCar(regNo)) {
-                        Car* car = God->getCar(regNo);
+                    if (DBMgr->findCar(regNo)) {
+                        Car* car = DBMgr->getCar(regNo);
 
                         if (!car->getisRented()) {
                             cout << acfr << "Car is not rented!" << endl;
@@ -328,6 +329,12 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                             cout << "Enter the return date in the format (dd mm yyyy): ";
                             cin >> dd >> mm >> yyyy;
 
+                            if (dd < 1 || dd > 31 || mm < 1 || mm > 12 || yyyy < 2020 || yyyy > 2026) {
+                                cout << acfr << "Invalid date!" << acr << "Please recheck details." << endl;
+                                pak2c();
+                                break;
+                            }
+
                             actualReturnDate = Date(dd, mm, yyyy);
 
                             days = actualReturnDate - car->getRentDate();
@@ -341,6 +348,13 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         } else {
                             cout << "How many days did you (actually) rent the car for? ";
                             cin >> days;
+                        }
+
+                        if (days > 15) {
+                            cout << acfr << "Invalid number of days!" << acr << "Please recheck details." << endl;
+                            cout << "Note : \tYou can rent a car for a maximum of 15 days." << endl;
+                            pak2c();
+                            break;
                         }
 
                         if (days == 0) {
@@ -367,7 +381,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         car->updateCondition(condition);
 
                         double fine = 0.0;
-                        fine = (10 * (1 - currentUser->getRecord()) * (days - car->getExpectedDays()));
+                        fine = (0.1 * (100.0 - currentUser->getRecord()) * (days - car->getExpectedDays()));
                         if (fine < 0) fine = 0.0;
 
                         double newRecord = currentUser->getRecord() - fine / 200.0;
@@ -418,25 +432,15 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         car->returnRequest(currentUser);
                         currentUser->returnCar(car);
 
-                        God->updateCar(car);
-                        
-                        if(role[0] == 'c') 
-                        {
-                            Customer* c = dynamic_cast<Customer*>(currentUser);
-                            God->updateCustomer(c);
-                        }
-                        else if(role[0] == 'e')
-                        {
-                            Employee* e = dynamic_cast<Employee*>(currentUser);
-                            God->updateEmployee(e);
-                        }
+                        DBMgr->updateCar(car);
+                        DBMgr->updateUser(currentUser);
 
                     } else {
                         cout << acfr "Car not found! " << acr << "Please recheck details." << endl;
                     }
 
-                    God->exportData();
-                    God->importData();
+                    DBMgr->exportData();
+                    DBMgr->importData();
 
                     pak2c();
                     break;
@@ -489,29 +493,23 @@ void Login(God* God, User* currentUser, bool& isRunning) {
 
                     double newRec = currentUser->getRecord() + 4.0;
                     if (newRec > 75.0) newRec = 75.0;
+                    if (currentUser->getDue() < 75.0) {
+                        currentUser->setRecord(newRec);
+                    }
 
                     currentUser->setRecord(newRec);
 
-                    if(role[0] == 'c') 
-                    {
-                        Customer* c = dynamic_cast<Customer*>(currentUser);
-                        God->updateCustomer(c);
-                    }
-                    else if(role[0] == 'e')
-                    {
-                        Employee* e = dynamic_cast<Employee*>(currentUser);
-                        God->updateEmployee(e);
-                    }
+                    DBMgr->updateUser(currentUser);
 
-                    God->exportData();
-                    God->importData();
-                    
+                    DBMgr->exportData();
+                    DBMgr->importData();
+
                     pak2c();
                     break;
                 }
                 case 5: {
                     cout << "Logging out...\n";
-                    God->exportData();
+                    DBMgr->exportData();
                     Sleep(400);
                     return;
                 }
@@ -521,9 +519,9 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                 }
             }
 
-            God->exportData();
-            God->importData();
-            
+            DBMgr->exportData();
+            DBMgr->importData();
+
         } while (choice != 5);
     } else if (role[0] == 'm') {
         Manager currManager(currentUser->getName(), currentUser->getID(), currentUser->getPassword());
@@ -566,7 +564,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
             switch (choice) {
                 case 1: {
                     // View All Cars
-                    God->showAllCars();
+                    DBMgr->showAllCars();
                     cout << dottedred;
 
                     pak2c();
@@ -590,24 +588,24 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         } else if (action[0] == 'm' || action[0] == 'M') {
                             flag = 1;
                             cout << "Enter the model of the car you want to search: " << endl;
-                            cin.ignore();
-                            getline(cin, model);
+
+                            cin >> (model);
                         }
 
                         std::transform(regNo.begin(), regNo.end(), regNo.begin(), ::toupper);
                         std::transform(model.begin(), model.end(), model.begin(), ::toupper);
 
-                        if (God->findCar(regNo) && flag == 0) {
-                            Car* car = God->getCar(regNo);
+                        if (DBMgr->findCar(regNo) && flag == 0) {
+                            Car* car = DBMgr->getCar(regNo);
                             car->getDetails();
-                        } else if (God->findCarbyModel(model) && flag == 1) {
-                            Car* car = God->getCarbyModel(model);
+                        } else if (DBMgr->findCarbyModel(model) && flag == 1) {
+                            Car* car = DBMgr->getCarbyModel(model);
                             car->getDetails();
                         } else {
                             cout << acfr << "Car not found! " << acr << "Please recheck details." << endl;
                             cout << "But here are the closest matches:\n"
                                  << endl;
-                            for (auto car : God->getCars()) {
+                            for (auto car : DBMgr->getCars()) {
                                 std::string regNoC = car.se->getRegNo();
                                 std::string modelC = car.se->getModel();
 
@@ -642,26 +640,25 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         } else {
                             flag = 1;
                             cout << "Enter the Name of the customer you want to search: " << endl;
-                            cin.ignore();
-                            getline(cin, name);
+                            cin >> (name);
                         }
 
                         transform(ID.begin(), ID.end(), ID.begin(), ::toupper);
                         transform(name.begin(), name.end(), name.begin(), ::toupper);
 
-                        if (God->findUser(ID) && flag == 0) {
-                            User* user = God->getUser(ID);
+                        if (DBMgr->findUser(ID) && flag == 0) {
+                            User* user = DBMgr->getUser(ID);
                             cout << dottedred;
                             user->getDetails();
-                        } else if (God->findUserbyName(name) && flag == 1) {
-                            User* user = God->getUserbyName(name);
+                        } else if (DBMgr->findUserbyName(name) && flag == 1) {
+                            User* user = DBMgr->getUserbyName(name);
                             cout << dottedred;
                             user->getDetails();
                         } else {
                             cout << acfr << "User not found! " << acr << "Please recheck details." << endl;
                             cout << "But here are the closest matches: " << endl;
 
-                            for (auto user : God->getCustomers()) {
+                            for (auto user : DBMgr->getCustomers()) {
                                 std::string IDU = user.se->getID();
                                 std::string nameU = user.se->getName();
 
@@ -674,7 +671,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                                 }
                             }
 
-                            for (auto user : God->getEmployees()) {
+                            for (auto user : DBMgr->getEmployees()) {
                                 std::string IDU = user.se->getID();
                                 std::string nameU = user.se->getName();
 
@@ -708,26 +705,25 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         } else {
                             flag = 1;
                             cout << "Enter the Name of the employee you want to search: " << endl;
-                            cin.ignore();
-                            getline(cin, name);
+                            cin >> (name);
                         }
 
                         transform(ID.begin(), ID.end(), ID.begin(), ::toupper);
                         transform(name.begin(), name.end(), name.begin(), ::toupper);
 
-                        if (God->findUser(ID) && flag == 0) {
-                            User* user = God->getUser(ID);
+                        if (DBMgr->findUser(ID) && flag == 0) {
+                            User* user = DBMgr->getUser(ID);
                             cout << dottedred;
                             user->getDetails();
-                        } else if (God->findUserbyName(name) && flag == 1) {
-                            User* user = God->getUserbyName(name);
+                        } else if (DBMgr->findUserbyName(name) && flag == 1) {
+                            User* user = DBMgr->getUserbyName(name);
                             cout << dottedred;
                             user->getDetails();
                         } else {
                             cout << acfr << "User not found! " << acr << "Please recheck details." << endl;
                             cout << "But here are the closest matches: " << endl;
 
-                            for (auto user : God->getCustomers()) {
+                            for (auto user : DBMgr->getCustomers()) {
                                 std::string IDU = user.se->getID();
                                 std::string nameU = user.se->getName();
 
@@ -740,7 +736,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                                 }
                             }
 
-                            for (auto user : God->getEmployees()) {
+                            for (auto user : DBMgr->getEmployees()) {
                                 std::string IDU = user.se->getID();
                                 std::string nameU = user.se->getName();
 
@@ -752,7 +748,6 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                                     user.se->getDetails();
                                 }
                             }
-
                         }
                     } else {
                         clearScreen();
@@ -771,7 +766,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                     cin >> (view);
 
                     if (view[0] == 'y' || view[0] == 'Y') {
-                        God->showAllCars();
+                        DBMgr->showAllCars();
                         cout << dottedred;
                     }
 
@@ -785,15 +780,15 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         int expectedDays;
 
                         cout << "Enter the car model: " << endl;
-                        cin.ignore();
-                        getline(cin, model);
+
+                        cin >> (model);
 
                         cout << "Enter the registration number: " << endl;
                         cin >> (regNo);
 
                         std::transform(regNo.begin(), regNo.end(), regNo.begin(), ::toupper);
 
-                        if (God->findCar(regNo)) {
+                        if (DBMgr->findCar(regNo)) {
                             cout << acfr << "Car already exists!" << acr << "Please enter a unique Registration No." << endl;
                             break;
                         }
@@ -821,9 +816,20 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                             cout << "Enter the renter's ID: ";
                             cin >> renterID;
 
+                            if (!DBMgr->findUser(renterID)) {
+                                cout << acfr << "User not found!" << acr << "Please enter a valid User ID." << endl;
+                                break;
+                            }
+
                             int dd, mm, yyyy;
                             cout << "Enter the rent date in the format (dd mm yyyy):";
                             cin >> dd >> mm >> yyyy;
+
+                            if (dd < 1 || dd > 31 || mm < 1 || mm > 12 || yyyy < 2020 || yyyy > 2026) {
+                                cout << acfr << "Invalid date!" << acr << "Please recheck details." << endl;
+                                break;
+                            }
+
                             rentDate = Date(dd, mm, yyyy);
 
                             cout << "Enter the expected number of days for rent: ";
@@ -835,22 +841,39 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                             expectedDays = 0;
                         }
 
-                        *car = Car(model, regNo, condition, isRented, renterID, rentDate, dailyRent, expectedDays);
+                        Car nC = Car(model, regNo, condition, isRented, renterID, rentDate, dailyRent, expectedDays);
+                        car = &nC;
 
                         cout << "Following are the details of the car you want to add: \n";
+
+                        cout << dottedgreen;
                         car->getDetails();
+                        cout << dottedgreen;
 
                         cout << "Are you sure you want to add this car? (y/n): ";
                         std::string confirm;
                         cin >> (confirm);
 
                         if (confirm[0] == 'y' || confirm[0] == 'Y') {
-                            God->addCar(car);
-                            
-                            // isRented??
-                        }
+                            DBMgr->addCar(car);
 
-                        
+                            if (isRented) {
+                                User* renter = DBMgr->getUser(renterID);
+
+                                car->rentRequest(renter);
+
+                                car->updateRentDate(rentDate);
+                                car->updateExpectedDays(expectedDays);
+
+                                // car->getDetails();
+
+                                DBMgr->updateCar(car);
+
+                                renter->rentCar(car);
+                                renter->addRent(car);
+                                DBMgr->updateUser(renter);
+                            }
+                        }
 
                     } else if (action[0] == 'u' || action[0] == 'U') {
                         // Update a car
@@ -868,12 +891,12 @@ void Login(God* God, User* currentUser, bool& isRunning) {
 
                         std::transform(regNo.begin(), regNo.end(), regNo.begin(), ::toupper);
 
-                        if (!God->findCar(regNo)) {
+                        if (!DBMgr->findCar(regNo)) {
                             cout << acfr << "Car not found!" << acr << "Please enter corrrect Registration No." << endl;
                             break;
                         }
 
-                        if (God->getCar(regNo)->getisRented() == true) {
+                        if (DBMgr->getCar(regNo)->getisRented() == true) {
                             cout << acfr << "Car is currently rented!" << acr << endl;
                             cout << "Are you sure you want to update this car? (y/n): ";
                             std::string confirm;
@@ -892,7 +915,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                             cout << "Enter the new daily rent: ";
                             cin >> dailyRent;
                         } else
-                            dailyRent = God->getCar(regNo)->getDailyRent();
+                            dailyRent = DBMgr->getCar(regNo)->getDailyRent();
 
                         cout << "Do you want to update the condition? (y/n): ";
                         cin >> (act);
@@ -906,7 +929,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                             }
 
                         } else
-                            condition = God->getCar(regNo)->getCondition();
+                            condition = DBMgr->getCar(regNo)->getCondition();
 
                         cout << "Do you want to update the renter's details? (y/n): ";
                         cin >> (act);
@@ -921,6 +944,11 @@ void Login(God* God, User* currentUser, bool& isRunning) {
 
                                 cout << "Enter the renter's ID: ";
                                 cin >> renterID;
+
+                                if (!DBMgr->findUser(renterID)) {
+                                    cout << acfr << "User not found!" << acr << "Please enter a valid User ID." << endl;
+                                    break;
+                                }
 
                                 int dd, mm, yyyy;
                                 cout << "Enter the rent date in the format (dd mm yyyy):";
@@ -937,32 +965,19 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                                 expectedDays = 0;
                             }
                         } else {
-                            isRented = God->getCar(regNo)->getisRented();
-                            renterID = God->getCar(regNo)->getRenterID();
-                            rentDate = God->getCar(regNo)->getRentDate();
-                            expectedDays = God->getCar(regNo)->getExpectedDays();
+                            isRented = DBMgr->getCar(regNo)->getisRented();
+                            renterID = DBMgr->getCar(regNo)->getRenterID();
+                            rentDate = DBMgr->getCar(regNo)->getRentDate();
+                            expectedDays = DBMgr->getCar(regNo)->getExpectedDays();
                         }
 
-                        *car = Car(God->getCar(regNo)->getModel(), regNo, condition, isRented, renterID, rentDate, dailyRent, expectedDays);
+                        *car = Car(DBMgr->getCar(regNo)->getModel(), regNo, condition, isRented, renterID, rentDate, dailyRent, expectedDays);
 
-                        God->updateCar(car);
+                        DBMgr->updateCar(car);
 
-                        if (isRented) {
-                            if(God->getCustomers().find(renterID) != God->getCustomers().end())
-                            {
-                                Customer* user = dynamic_cast<Customer*>(God->getCustomers()[renterID]);
-                                user->rentCar(car);
-                                user->addRent(car);
-                                God->updateCustomer(user);
-                            }
-                            else if(God->getEmployees().find(renterID) != God->getEmployees().end())
-                            {
-                                Employee* user = dynamic_cast<Employee*>(God->getEmployees()[renterID]);
-                                user->rentCar(car);
-                                user->addRent(car);
-                                God->updateEmployee(user);
-                            }
-                        }
+                        currentUser->rentCar(car);
+                        currentUser->addRent(car);
+                        DBMgr->updateUser(currentUser);
 
                     } else if (action[0] == 'd' || action[0] == 'D') {
                         // Delete a car
@@ -974,7 +989,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
 
                         std::transform(regNo.begin(), regNo.end(), regNo.begin(), ::toupper);
 
-                        if (!God->findCar(regNo)) {
+                        if (!DBMgr->findCar(regNo)) {
                             cout << acfr << "Car not found!" << acr << "Please enter corrrect Registration No." << endl;
                             break;
                         }
@@ -984,12 +999,12 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         cin >> (confirm);
 
                         if (confirm[0] == 'y' || confirm[0] == 'Y') {
-                            if (God->getCar(regNo)->getisRented()) {
+                            if (DBMgr->getCar(regNo)->getisRented()) {
                                 cout << acfr << "Car is currently rented! Cannot delete." << acr << endl;
                                 break;
                             }
 
-                            God->removeCar(God->getCar(regNo));
+                            DBMgr->removeCar(DBMgr->getCar(regNo));
                             cout << "Car deleted successfully." << endl;
                         }
 
@@ -1006,7 +1021,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                     cin >> (view);
 
                     if (view[0] == 'y' || view[0] == 'Y') {
-                        God->showAllUsers("Customer");
+                        DBMgr->showAllUsers("Customer");
                         cout << dottedred;
                     }
 
@@ -1019,8 +1034,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         std::string CName, CID, CPassword;
 
                         cout << "Enter the customer's Name: " << endl;
-                        cin.ignore();
-                        getline(cin, CName);
+                        cin >> (CName);
 
                         bool unique_ID = false;
                         while (unique_ID == false) {
@@ -1036,7 +1050,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
 
                             // check if ID already exists
 
-                            if (God->findUser(CID) == true) {
+                            if (DBMgr->findUser(CID) == true) {
                                 cerr << "ID '" << CID << "' already exists. Please choose a different ID." << endl;
                             } else {
                                 unique_ID = true;
@@ -1046,7 +1060,8 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         cout << "Create a password: ";
                         CPassword = getPassword();
 
-                        *customer = Customer(CName, CID, CPassword);
+                        Customer nC = Customer(CName, CID, CPassword);
+                        customer = &nC;
 
                         cout << "Following are the details of the customer you want to add: \n";
                         customer->getDetails();
@@ -1056,15 +1071,18 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         cin >> (confirm);
 
                         if (confirm[0] == 'y' || confirm[0] == 'Y') {
-                            God->addCustomer(customer);
+                            DBMgr->addCustomer(customer);
                             cout << "Customer added successfully." << endl;
                         }
+
+                        pak2c();
+                        break;
 
                     } else if (action[0] == 'u' || action[0] == 'U') {
                         // Update a customer
 
                         Customer* customer;
-                        std::string ID, password;
+                        std::string Name, ID, password;
                         std::string act;
 
                         cout << "Enter the ID of the customer you want to update: ";
@@ -1077,9 +1095,17 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                             continue;
                         }
 
-                        if (!God->findUser(ID)) {
+                        if (!DBMgr->findUser(ID)) {
                             cout << acfr << "Customer not found!" << acr << "Please enter corrrect ID." << endl;
                             break;
+                        }
+
+                        cout << "Do you want to update the name? (y/n): ";
+                        cin >> (act);
+
+                        if (act[0] == 'y' || act[0] == 'Y') {
+                            cout << "Enter the new name: ";
+                            cin >> (Name);
                         }
 
                         cout << "Do you want to update the password? (y/n): ";
@@ -1091,19 +1117,27 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         }
 
                         cout << "Are you sure you want to update this customer? (y/n): ";
-                        customer->getDetails();
                         std::string confirm;
                         cin >> (confirm);
 
                         if (confirm[0] == 'y' || confirm[0] == 'Y') {
-                            *customer = Customer(God->getUser(ID)->getName(), ID, password);
-                            God->updateCustomer(customer);
+                            Customer nC = Customer(Name, ID, password);
+                            customer = &nC;
+
+                            cout << dottedgreen;
+                            customer->getDetails();
+                            cout << dottedgreen;
+
+                            DBMgr->updateCustomer(customer);
                         }
+
+                        pak2c();
+                        break;
 
                     } else if (action[0] == 'd' || action[0] == 'D') {
                         // Delete a customer
                         Customer* customer;
-                        
+
                         std::string ID;
 
                         cout << "Enter the ID of the customer you want to delete: ";
@@ -1116,25 +1150,54 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                             continue;
                         }
 
-                        if (!God->findUser(ID)) {
+                        if (ID == currentUser->getID()) {
+                            cout << acfr << "Sorry! Please don't delete yourself! :/" << acr << endl;
+                            break;
+                        }
+
+                        if (!DBMgr->findUser(ID)) {
                             cout << acfr << "Customer not found!" << acr << "Please enter corrrect ID." << endl;
                             break;
                         }
 
-                        if (God->getUser(ID)->getRentedCars().size() > 0) {
+                        if (DBMgr->getUser(ID)->getRentedCars().size() > 0) {
                             cout << acfr << "Customer has rented cars! Cannot delete." << acr << endl;
                             break;
                         }
 
-                        cout << "Are you sure you want to delete this customer? (y/n): ";
+                        if (DBMgr->getUser(ID)->getDue() > 0) {
+                            cout << acfr << "Customer has dues! Cannot delete." << acr << endl;
+                            cout << "Do you want to clear the dues? (y/n): ";
+                            std::string confirm;
+                            cin >> (confirm);
+
+                            if (confirm[0] == 'y' || confirm[0] == 'Y') {
+                                DBMgr->getUser(ID)->clearDues();
+                                cout << acfg << "Dues cleared successfully." << acr << endl;
+                            } else
+                                break;
+                        }
+
+                        pak2c();
+
+                        customer = DBMgr->getCustomer(ID);
+
+                        cout << dottedred;
                         customer->getDetails();
+                        cout << dottedred;
+
+                        cout << "Are you sure you want to delete this customer? (y/n): ";
+
                         std::string confirm;
                         cin >> (confirm);
 
                         if (confirm[0] == 'y' || confirm[0] == 'Y') {
-                            God->removeCustomer(God->getCustomer(ID));
+                            DBMgr->removeCustomer(ID);
                             cout << "Customer deleted successfully." << endl;
                         }
+
+                        pak2c();
+                        break;
 
                     } else if (action[0] == 'n' || action[0] == 'N') {
                         break;
@@ -1151,7 +1214,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                     cin >> (view);
 
                     if (view[0] == 'y' || view[0] == 'Y') {
-                        God->showAllUsers("Employee");
+                        DBMgr->showAllUsers("Employee");
                         cout << dottedred;
                     }
 
@@ -1164,8 +1227,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         std::string EName, EID, EPassword;
 
                         cout << "Enter the employee's Name: " << endl;
-                        cin.ignore();
-                        getline(cin, EName);
+                        cin >> (EName);
 
                         bool unique_ID = false;
                         while (unique_ID == false) {
@@ -1181,8 +1243,8 @@ void Login(God* God, User* currentUser, bool& isRunning) {
 
                             // check if ID already exists
 
-                            if (God->findUser(EID) == true) {
-                                cerr << "ID '" << EID << "' already exists. Please choose a different ID." << endl;
+                            if (DBMgr->findUser(EID) == true) {
+                                cerr << acfr << "ID '" << EID << "' already exists. Please choose a different ID." << acr << endl;
                             } else {
                                 unique_ID = true;
                             }
@@ -1191,25 +1253,32 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         cout << "Create a password: ";
                         EPassword = getPassword();
 
-                        *employee = Employee(EName, EID, EPassword);
+                        Employee nE = Employee(EName, EID, EPassword);
+                        employee = &nE;
 
                         cout << "Following are the details of the employee you want to add: \n";
+
+                        cout << dottedgreen;
                         employee->getDetails();
+                        cout << dottedgreen;
 
                         cout << "Are you sure you want to add this employee? (y/n): ";
                         std::string confirm;
                         cin >> (confirm);
 
                         if (confirm[0] == 'y' || confirm[0] == 'Y') {
-                            God->addEmployee(employee);
+                            DBMgr->addEmployee(employee);
                             cout << "Employee added successfully." << endl;
                         }
+
+                        pak2c();
+                        break;
 
                     } else if (action[0] == 'u' || action[0] == 'U') {
                         // Update an employee
 
                         Employee* employee;
-                        std::string ID, password;
+                        std::string Name, ID, password;
                         std::string act;
 
                         cout << "Enter the ID of the employee you want to update: ";
@@ -1222,9 +1291,17 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                             continue;
                         }
 
-                        if (!God->findUser(ID)) {
+                        if (!DBMgr->findUser(ID)) {
                             cout << acfr << "Employee not found!" << acr << "Please enter corrrect ID." << endl;
                             break;
+                        }
+
+                        cout << "Do you want to update the name? (y/n): ";
+                        cin >> (act);
+
+                        if (act[0] == 'y' || act[0] == 'Y') {
+                            cout << "Enter the new name: ";
+                            cin >> (Name);
                         }
 
                         cout << "Do you want to update the password? (y/n): ";
@@ -1235,8 +1312,26 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                             password = getPassword();
                         }
 
-                        *employee = Employee(God->getUser(ID)->getName(), ID, password);
-                        God->updateEmployee(employee);
+                        cout << "Are you sure you want to update this employee? (y/n): ";
+                        std::string confirm;
+                        cin >> (confirm);
+
+                        if (confirm[0] == 'y' || confirm[0] == 'Y') {
+                            Employee nE = Employee(Name, ID, password);
+                            employee = &nE;
+
+                            cout << dottedgreen;
+                            employee->getDetails();
+                            cout << dottedgreen;
+
+                            DBMgr->updateEmployee(employee);
+
+                            cout << acfg << "Employee updated successfully.\n"
+                                 << acr << endl;
+                        }
+
+                        pak2c();
+                        break;
 
                     } else if (action[0] == 'd' || action[0] == 'D') {
                         // Delete an employee
@@ -1246,6 +1341,11 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         cout << "Enter the ID of the employee you want to delete: ";
                         cin >> (ID);
 
+                        if (ID == currentUser->getID()) {
+                            cout << acfr << "Sorry! Please don't delete yourself! :/" << acr << endl;
+                            break;
+                        }
+
                         if (cin.fail()) {
                             cin.clear();
                             cin.ignore(1000, '\n');
@@ -1253,30 +1353,49 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                             continue;
                         }
 
-                        if (!God->findUser(ID)) {
+                        if (!DBMgr->findUser(ID)) {
                             cout << acfr << "Employee not found!" << acr << "Please enter corrrect ID." << endl;
                             break;
                         }
 
-                        if (God->getUser(ID)->getRentedCars().size() > 0) {
+                        if (DBMgr->getUser(ID)->getRentedCars().size() > 0) {
                             cout << acfr << "Employee has rented cars! Cannot delete." << acr << endl;
                             break;
                         }
 
-                        if(God->getEmployee(ID)->memberType == "Manager")
-                        {
+                        if (DBMgr->getEmployee(ID)->memberType == "Manager") {
                             cout << acfr << "Cannot delete the Manager!" << acr << endl;
                             break;
                         }
 
-                        cout << "Are you sure you want to delete this employee? (y/n): ";
+                        if (DBMgr->getUser(ID)->getDue() > 0) {
+                            cout << acfr << "Employee has dues! Cannot delete." << acr << endl;
+                            cout << "Do you want to clear the dues? (y/n): ";
+                            std::string confirm;
+                            cin >> (confirm);
+
+                            if (confirm[0] == 'y' || confirm[0] == 'Y') {
+                                DBMgr->getUser(ID)->clearDues();
+                                cout << acfg << "Dues cleared successfully." << acr << endl;
+                            } else
+                                break;
+                        }
+
+                        pak2c();
+
+                        employee = DBMgr->getEmployee(ID);
+                        cout << dottedred;
                         employee->getDetails();
+                        cout << dottedred;
+
+                        cout << "Are you sure you want to delete this employee? (y/n): ";
                         std::string confirm;
                         cin >> (confirm);
 
                         if (confirm[0] == 'y' || confirm[0] == 'Y') {
-                            God->removeEmployee(God->getEmployee(ID));
-                            cout << "Employee deleted successfully." << endl;
+                            DBMgr->removeEmployee(ID);
+
+                            cout << acfr << "Employee deleted successfully." << acr << endl;
                         }
 
                     } else if (action[0] == 'n' || action[0] == 'N') {
@@ -1291,7 +1410,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                 }
                 case 6: {
                     cout << "Logging out...\n";
-                    God->exportData();
+                    DBMgr->exportData();
                     Sleep(400);
                     return;
                 }
@@ -1300,44 +1419,44 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                     cout << acfr << "Invalid choice. Please try again." << acr << endl;
                 }
             }
-            
-            God->exportData();
-            God->importData();
+
+            DBMgr->exportData();
+            DBMgr->importData();
 
         } while (choice != 6);
     }
 
-    God->exportData();
+    DBMgr->exportData();
 }
 
 //// Storage for static members     //////////////////////////////////////
 
-std::map<std::string, Customer*> God::Customers;
-std::map<std::string, Employee*> God::Employees;
-std::map<std::string, Car*> God::Cars;
+std::map<std::string, Customer*> DBMgr::Customers;
+std::map<std::string, Employee*> DBMgr::Employees;
+std::map<std::string, Car*> DBMgr::Cars;
 
 //// Main Function                  //////////////////////////////////////
 
 int main() {
-    Hii();
+    INIT_FUN();
 
-    God gawdd;
-    God* God = &gawdd;
+    DBMgr dbmgr;
+    DBMgr* DBMgr = &dbmgr;
 
     bool isRunning = true;
 
-    God->importData();
+    DBMgr->importData();
 
     User currentUser;
     User* LoggedInUser = &currentUser;
 
     do {
-        Login(God, LoggedInUser, isRunning);
+        Login(DBMgr, LoggedInUser, isRunning);
     } while (isRunning);
 
-    God->exportData();
+    DBMgr->exportData();
 
-    BBye();
+    EXIT_FUN();
 
     return 0;
 }

@@ -5,7 +5,7 @@
 
 #include "global.hpp"
 
-void Hii() {
+void INIT_FUN() {
     Sleep(300);
     cout << "Welcome to Car Rental System!!. Working on " << get_platform_name()
          << " platform." << endl;
@@ -73,7 +73,7 @@ void pak2c() {
     getchar();
 }
 
-void BBye() {
+void EXIT_FUN() {
     clearScreen();
     cout << acfy << "##########             Thank you for using CaR-e-MaSyS!             ##########" << acr << endl;
     cout << acfg << "##########                         Goodbye!                         ##########" << acr << endl;

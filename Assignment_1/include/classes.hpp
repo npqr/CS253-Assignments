@@ -6,7 +6,7 @@
 
 //// Class Declarations             //////////////////////////////////////
 
-class God;
+class DBMgr;
 class User;
 class Customer;
 class Employee;
@@ -99,7 +99,7 @@ class User {
     void returnCar(Car* car);
     void setRecord(double newRecord) { record = newRecord; }
 
-    void showMyCars(God* God);
+    void showMyCars(DBMgr* DBMgr);
 
     void operator= (const User* other) {
         name = other->name;
@@ -135,7 +135,7 @@ class User {
     void getDetails();
 
     friend Manager;
-    friend God;
+    friend DBMgr;
 };
 
 // Also add Help function
@@ -213,17 +213,6 @@ class Car {
     float getDailyRent() const { return dailyRent; }
     int getExpectedDays() const { return expectedDays; }
 
-    // void operator= (const Car& other) {
-    //     model = other.model;
-    //     regNo = other.regNo;
-    //     condition = other.condition;
-    //     isRented = other.isRented;
-    //     renterID = other.renterID;
-    //     rentDate = other.rentDate;
-    //     dailyRent = other.dailyRent;
-    //     expectedDays = other.expectedDays;
-    // }
-
     void getDetails();
     void rentRequest(User* user);
     void updateRentDate(Date date);
@@ -234,9 +223,9 @@ class Car {
     friend Manager;
 };
 
-//// God Class                    //////////////////////////////////////
+//// DBMgr Class                    //////////////////////////////////////
 
-class God {
+class DBMgr {
    protected:
     static std::map<std::string, Customer*> Customers;
     static std::map<std::string, Employee*> Employees;
@@ -244,7 +233,7 @@ class God {
 
    public:
 
-    God(){};
+    DBMgr(){};
 
     bool findUser(std::string ID);
     bool findUserbyName(std::string name);
@@ -254,11 +243,11 @@ class God {
 
     void addCustomer(Customer* customer);
     void updateCustomer(Customer* customer);
-    void removeCustomer(Customer* customer);
+    void removeCustomer(std::string ID);
 
     void addEmployee(Employee* employee);
     void updateEmployee(Employee* employee);
-    void removeEmployee(Employee* employee);
+    void removeEmployee(std::string ID);
 
     bool findCarbyModel(std::string model);
     Car* getCarbyModel(std::string model);
@@ -270,6 +259,8 @@ class God {
     void showAllUsers(std::string memberType);
     void showAllCars();
     void showAllCarsSecure();
+
+    void updateUser(User* user);
 
     bool login(std::string ID, std::string password);
     void logout();
@@ -288,13 +279,13 @@ class God {
 
 //// Manager Class                //////////////////////////////////////
 
-class Manager : public User, public God {
+class Manager : public User, public DBMgr {
    protected:
    public:
     Manager(){};
 
     Manager(const std::string name, std::string ID, const std::string password)
-        : User(name, ID, password), God() {
+        : User(name, ID, password), DBMgr() {
         memberType = "Manager";
     }
 };

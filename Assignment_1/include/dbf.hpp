@@ -24,7 +24,7 @@ void extractDate(const std::string dateString, int& day, int& month, int& year) 
     year = std::stoi(yearStr);
 }
 
-void God::importData() {
+void DBMgr::importData() {
     Json::Value root;
     ifstream file("db/data.json");
     file >> root;
@@ -41,7 +41,6 @@ void God::importData() {
         newUser->record = customer["record"].asDouble();
         newUser->due = customer["due"].asDouble();
 
-
         for (auto car : customer["rentedCars"]) {
             int d, m, y;
             if ((std::string) car["rentDate"].asString() == "") {
@@ -51,11 +50,6 @@ void God::importData() {
             }
 
             extractDate((std::string)car["rentDate"].asString(), d, m, y);
-            
-            // cout << "DFDSFDSFFDSFDSFSFDSFSFSSF\n";
-            // cout << d << " " << m << " " << y << endl;
-
-            // pak2c();
 
             Car* newCar = new Car(
                 (std::string) car["model"].asString(),
@@ -118,15 +112,8 @@ void God::importData() {
             m = 1;
             y = 2001;
         }
-        // cout << "DOES THIS WORK??" << endl;
-
-        // cout << "OG String : " << (std::string)car["rentDate"].asString() << endl;
 
         extractDate((std::string)car["rentDate"].asString(), d, m, y);
-
-        // cout << d << " " << m << " " << y << endl;
-
-        // Sleep(500);
 
         Car* newCar = new Car(
             (std::string) car["model"].asString(),
@@ -142,7 +129,7 @@ void God::importData() {
     }
 }
 
-void God::exportData() {
+void DBMgr::exportData() {
     Json::Value root;
     Json::Value customers;
     Json::Value employees;
@@ -197,8 +184,6 @@ void God::exportData() {
             rc["rentDate"] = car->getRentDateString();
             rc["dailyRent"] = car->getDailyRent();
             rc["expectedDays"] = car->getExpectedDays();
-
-            // cout << "Exporting: " << rc["model"] << endl;
 
             employeeNode["rentedCars"].append(rc);
         }

@@ -1,183 +1,179 @@
 {
-	"cars" : 
-	[
+	"cars": [
 		{
-			"condition" : 74.0,
-			"dailyRent" : 2500.0,
-			"expectedDays" : 6,
-			"isRented" : false,
-			"model" : "Audi Q7",
-			"regNo" : "AUDIQ7",
-			"rentDate" : "1/1/2001",
-			"renterID" : ""
+			"condition": 74.0,
+			"dailyRent": 2500.0,
+			"expectedDays": 5,
+			"isRented": true,
+			"model": "Audi Q7",
+			"regNo": "AUDIQ7",
+			"rentDate": "12/2/2023",
+			"renterID": "harry301"
 		},
 		{
-			"condition" : 60.0,
-			"dailyRent" : 2000.0,
-			"expectedDays" : 5,
-			"isRented" : false,
-			"model" : "BMW X5",
-			"regNo" : "BMWX5",
-			"rentDate" : "1/1/2001",
-			"renterID" : ""
+			"condition": 60.0,
+			"dailyRent": 2000.0,
+			"expectedDays": 5,
+			"isRented": false,
+			"model": "BMW X5",
+			"regNo": "BMWX5",
+			"rentDate": "1/1/2001",
+			"renterID": ""
 		},
 		{
-			"condition" : 88.0,
-			"dailyRent" : 3500.0,
-			"expectedDays" : 7,
-			"isRented" : true,
-			"model" : "Mercedes-Benz E-Class",
-			"regNo" : "MBE234",
-			"rentDate" : "14/4/2024",
-			"renterID" : "harry301"
+			"condition": 86.0,
+			"dailyRent": 3500.0,
+			"expectedDays": 5,
+			"isRented": false,
+			"model": "Mercedes-Benz E-Class",
+			"regNo": "MBE234",
+			"rentDate": "1/1/2001",
+			"renterID": ""
 		},
 		{
-			"condition" : 43.0,
-			"dailyRent" : 1500.0,
-			"expectedDays" : 5,
-			"isRented" : false,
-			"model" : "Toyota Prius",
-			"regNo" : "TP456",
-			"rentDate" : "1/1/2001",
-			"renterID" : ""
+			"condition": 43.0,
+			"dailyRent": 1500.0,
+			"expectedDays": 5,
+			"isRented": false,
+			"model": "Toyota Prius",
+			"regNo": "TP456",
+			"rentDate": "1/1/2001",
+			"renterID": ""
 		},
 		{
-			"condition" : 49.0,
-			"dailyRent" : 4000.0,
-			"expectedDays" : 5,
-			"isRented" : false,
-			"model" : "Tesla Model S",
-			"regNo" : "TS123",
-			"rentDate" : "1/1/2001",
-			"renterID" : ""
+			"condition": 72.0,
+			"dailyRent": 4000.0,
+			"expectedDays": 5,
+			"isRented": false,
+			"model": "Tesla Model S",
+			"regNo": "TS123",
+			"rentDate": "1/1/2001",
+			"renterID": ""
 		}
 	],
-	"customers" : 
-	[
+	"customers": [
 		{
-			"ID" : "202",
-			"due" : 0.0,
-			"memberType" : "Customer",
-			"name" : "Frodo Baggins",
-			"password" : "Mord0rR!ng",
-			"record" : 75.0,
-			"rentLimit" : 5,
-			"rentedCars" : []
+			"ID": "202",
+			"due": 0.0,
+			"memberType": "Customer",
+			"name": "Frodo Baggins",
+			"password": "Mord0rR!ng",
+			"record": 71.599999999999994,
+			"rentLimit": 5,
+			"rentedCars": []
 		},
 		{
-			"ID" : "203",
-			"due" : 0.0,
-			"memberType" : "Customer",
-			"name" : "Leia Skywalker",
-			"password" : "TheForceB3WithU!",
-			"record" : 75.0,
-			"rentLimit" : 5,
-			"rentedCars" : []
+			"ID": "203",
+			"due": 0.0,
+			"memberType": "Customer",
+			"name": "Leia Skywalker",
+			"password": "TheForceB3WithU!",
+			"record": 75.0,
+			"rentLimit": 5,
+			"rentedCars": []
 		},
 		{
-			"ID" : "204",
-			"due" : 0.0,
-			"memberType" : "Customer",
-			"name" : "Ellen Ripley",
-			"password" : "N0tAloneInSpace!",
-			"record" : 75.0,
-			"rentLimit" : 5,
-			"rentedCars" : []
+			"ID": "204",
+			"due": 0.0,
+			"memberType": "Customer",
+			"name": "Ellen Ripley",
+			"password": "N0tAloneInSpace!",
+			"record": 75.0,
+			"rentLimit": 5,
+			"rentedCars": []
 		},
 		{
-			"ID" : "205",
-			"due" : 0.0,
-			"memberType" : "Customer",
-			"name" : "John McClane",
-			"password" : "YippeeKiYay!",
-			"record" : 75.0,
-			"rentLimit" : 5,
-			"rentedCars" : []
+			"ID": "205",
+			"due": 0.0,
+			"memberType": "Customer",
+			"name": "John McClane",
+			"password": "YippeeKiYay!",
+			"record": 75.0,
+			"rentLimit": 5,
+			"rentedCars": []
 		},
 		{
-			"ID" : "302",
-			"due" : 0.0,
-			"memberType" : "Customer",
-			"name" : "Franklin Roosevelt",
-			"password" : "franklin123",
-			"record" : 75.0,
-			"rentLimit" : 5,
-			"rentedCars" : []
+			"ID": "302",
+			"due": 0.0,
+			"memberType": "Customer",
+			"name": "Franklin Roosevelt",
+			"password": "franklin123",
+			"record": 75.0,
+			"rentLimit": 5,
+			"rentedCars": []
 		}
 	],
-	"employees" : 
-	[
+	"employees": [
 		{
-			"ID" : "303",
-			"due" : 0.0,
-			"memberType" : "Employee",
-			"name" : "Grace Kelly",
-			"password" : "grace123",
-			"record" : 75.0,
-			"rentLimit" : 5,
-			"rentedCars" : []
+			"ID": "303",
+			"due": 0.0,
+			"memberType": "Employee",
+			"name": "Grace Kelly",
+			"password": "grace123",
+			"record": 75.0,
+			"rentLimit": 5,
+			"rentedCars": []
 		},
 		{
-			"ID" : "304",
-			"due" : 0.0,
-			"memberType" : "Employee",
-			"name" : "Henry Ford",
-			"password" : "henry123",
-			"record" : 75.0,
-			"rentLimit" : 5,
-			"rentedCars" : []
+			"ID": "304",
+			"due": 0.0,
+			"memberType": "Employee",
+			"name": "Henry Ford",
+			"password": "henry123",
+			"record": 75.0,
+			"rentLimit": 5,
+			"rentedCars": []
 		},
 		{
-			"ID" : "305",
-			"due" : 0.0,
-			"memberType" : "Employee",
-			"name" : "Isaac Newton",
-			"password" : "isaac123",
-			"record" : 75.0,
-			"rentLimit" : 5,
-			"rentedCars" : []
+			"ID": "305",
+			"due": 0.0,
+			"memberType": "Employee",
+			"name": "Isaac Newton",
+			"password": "isaac123",
+			"record": 75.0,
+			"rentLimit": 5,
+			"rentedCars": []
 		},
 		{
-			"ID" : "harry301",
-			"due" : 24500.0,
-			"memberType" : "Employee",
-			"name" : "Emma Watson",
-			"password" : "emma123",
-			"record" : 75.0,
-			"rentLimit" : 5,
-			"rentedCars" : 
-			[
+			"ID": "harry301",
+			"due": 12500.0,
+			"memberType": "Employee",
+			"name": "Emma Watson",
+			"password": "emma123",
+			"record": 60.299999999999997,
+			"rentLimit": 5,
+			"rentedCars": [
 				{
-					"condition" : 88.0,
-					"dailyRent" : 3500.0,
-					"expectedDays" : 7,
-					"isRented" : true,
-					"model" : "Mercedes-Benz E-Class",
-					"regNo" : "MBE234",
-					"rentDate" : "1/1/2001",
-					"renterID" : "harry301"
+					"condition": 74.0,
+					"dailyRent": 2500.0,
+					"expectedDays": 5,
+					"isRented": true,
+					"model": "Audi Q7",
+					"regNo": "AUDIQ7",
+					"rentDate": "1/1/2001",
+					"renterID": "harry301"
 				}
 			]
 		},
 		{
-			"ID" : "hermi201",
-			"due" : 0.0,
-			"memberType" : "Employee",
-			"name" : "Hermione Granger",
-			"password" : "leviosa",
-			"record" : 75.0,
-			"rentLimit" : 5,
-			"rentedCars" : []
+			"ID": "hermi201",
+			"due": 0.0,
+			"memberType": "Employee",
+			"name": "Hermione Granger",
+			"password": "leviosa",
+			"record": 75.0,
+			"rentLimit": 5,
+			"rentedCars": []
 		},
 		{
-			"ID" : "peter101",
-			"due" : 0.0,
-			"memberType" : "Manager",
-			"name" : "Tony Stark",
-			"password" : "lu3000",
-			"record" : 75.0,
-			"rentLimit" : 5,
-			"rentedCars" : []
+			"ID": "jarvis",
+			"due": 0.0,
+			"memberType": "Manager",
+			"name": "Tony Stark",
+			"password": "jarvis",
+			"record": 75.0,
+			"rentLimit": 5,
+			"rentedCars": []
 		}
 	]
 }

@@ -35,11 +35,13 @@
     #define CLEAR_SCREEN "cls"
     #include <conio.h>
     #include <windows.h>
+    #define Sleep(x) Sleep(x)
 #elif defined(__linux__)
     #define PLATFORM_NAME "Linux" // Debian, Ubuntu, Gentoo, Fedora, openSUSE, RedHat, Centos and other
     #define CLEAR_SCREEN "clear"
     #include <termios.h>
     #include <unistd.h>
+    #define Sleep(x) usleep(x * 1000)
 #elif defined(__APPLE__) && defined(__MACH__) // Support still needed to be added
     #define PLATFORM_NAME "Mac OS" // Apple OSX
 #else

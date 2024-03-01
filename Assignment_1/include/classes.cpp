@@ -1,49 +1,57 @@
 #include "classes.hpp"
+
 #include "global.hpp"
 
-//// God Class Functions          //////////////////////////////////////
+//// DBMgr Class Functions          //////////////////////////////////////
 
-void God::addCustomer(Customer *customer) {
-    *Customers[customer->getID()] = *customer;
+void DBMgr::addCustomer(Customer *customer) {
+    Customers[customer->getID()] = customer;
 }
 
-void God::updateCustomer(Customer *customer) {
-    *Customers[customer->getID()] = *customer;
+void DBMgr::updateCustomer(Customer *customer) {
+    Customers[customer->getID()] = customer;
 }
 
-void God::removeCustomer(Customer *customer) {
-    Customers.erase(customer->getID());
+void DBMgr::removeCustomer(std::string ID) {
+    if (Customers.find(ID) != Customers.end())
+        Customers.erase(ID);
 }
 
-void God::addEmployee(Employee *employee) {
-    *Employees[employee->getID()] = *employee;
+void DBMgr::addEmployee(Employee *employee) {
+    Employees[employee->getID()] = employee;
 }
 
-void God::updateEmployee(Employee *employee) {
-    *Employees[employee->getID()] = *employee;
+void DBMgr::updateEmployee(Employee *employee) {
+    Employees[employee->getID()] = employee;
 }
 
-void God::removeEmployee(Employee *employee) {
-    Employees.erase(employee->getID());
+void DBMgr::removeEmployee(std::string ID) {
+    if (Employees.find(ID) != Employees.end())
+        Employees.erase(ID);
 }
 
-void God::addCar(Car *car) {
-    *Cars[car->getRegNo()] = *car;
+void DBMgr::updateUser(User *user) {
+    if (Customers.find(user->getID()) != Customers.end())
+        Customers[user->getID()] = (Customer *)user;
+    else
+        Employees[user->getID()] = (Employee *)user;
 }
 
-void God::updateCar(Car *car) {
-    *Cars[car->getRegNo()] = *car;
+void DBMgr::addCar(Car *car) {
+    Cars[car->getRegNo()] = car;
 }
 
-void God::removeCar(Car *car) {
+void DBMgr::updateCar(Car *car) {
+    Cars[car->getRegNo()] = car;
+}
+
+void DBMgr::removeCar(Car *car) {
     Cars.erase(car->getRegNo());
 }
 
-void God::showAllUsers(std::string memberType) {
-    
-    if(memberType == "Customer") 
-        {
-    for (auto user : Customers) {
+void DBMgr::showAllUsers(std::string memberType) {
+    if (memberType == "Customer") {
+        for (auto user : Customers) {
             cout << dottedred;
             cout << "Name          : " << acfy << std::left << std::setw(30) << user.se->getName() << "\t"
                  << acr << std::right << std::setw(20) << "ID : " << std::left << acfy << std::right << std::setw(10) << user.se->getID() << acr << endl;
@@ -52,7 +60,7 @@ void God::showAllUsers(std::string memberType) {
                  << acr << std::right << std::setw(20) << "Payment Due : " << std::left << acfr << std::right << std::setw(10) << std::fixed << std::setprecision(2) << user.se->due << acr << endl;
 
             if (user.se->rentedCars.size() > 0) cout << "\nCars Rented ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n\n";
-                                                          
+
             for (auto car : user.se->rentedCars) {
                 cout << "Model : " << acfy << std::left << std::setw(22) << car->getModel()
                      << std::right << std::setw(21) << acr << "Registration No. : " << acfy << std::setw(12) << car->getRegNo() << acr << endl;
@@ -66,6 +74,41 @@ void God::showAllUsers(std::string memberType) {
                     cout << acfy;
                 else
                     cout << acfg;
+
+                car->updateRentDate(getCar(car->getRegNo())->getRentDate());
+
+                cout << std::setprecision(2) << car->getCondition() << acr << "\t"
+                     << std::right << std::setw(27) << acr << "Due Date : " << acfg << std::setw(20) << car->getDueDate() << acr << endl;
+                cout << endl;
+            }
+        }
+        cout << dottedred;
+    } else if (memberType == "Employee") {
+        for (auto user : Employees) {
+            cout << dottedred;
+            cout << "Name          : " << acfy << std::left << std::setw(30) << user.se->getName() << "\t"
+                 << acr << std::right << std::setw(20) << "ID : " << std::left << acfy << std::right << std::setw(10) << user.se->getID() << acr << endl;
+
+            cout << "# Rented Cars : " << acfg << std::left << std::setw(30) << user.se->rentedCars.size() << "\t"
+                 << acr << std::right << std::setw(20) << "Payment Due : " << std::left << acfr << std::right << std::setw(10) << std::fixed << std::setprecision(2) << user.se->due << acr << endl;
+
+            if (user.se->rentedCars.size() > 0) cout << "\nCars Rented ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n\n";
+
+            for (auto car : user.se->rentedCars) {
+                cout << "Model : " << acfy << std::left << std::setw(22) << car->getModel()
+                     << std::right << std::setw(21) << acr << "Registration No. : " << acfy << std::setw(12) << car->getRegNo() << acr << endl;
+                cout << "Condition : " << acfg << std::left << std::setw(5);
+
+                float cond = car->getCondition();
+
+                if (cond < 30)
+                    cout << acfr;
+                else if (cond < 60)
+                    cout << acfy;
+                else
+                    cout << acfg;
+
+                car->updateRentDate(getCar(car->getRegNo())->getRentDate());
 
                 cout << std::setprecision(2) << car->getCondition() << acr << "\t"
                      << std::right << std::setw(27) << acr << "Due Date : " << acfg << std::setw(20) << car->getDueDate() << acr << endl;
@@ -74,43 +117,9 @@ void God::showAllUsers(std::string memberType) {
         }
         cout << dottedred;
     }
-    else if(memberType == "Employee") 
-    {
-    for (auto user : Employees) {
-            cout << dottedred;
-            cout << "Name          : " << acfy << std::left << std::setw(30) << user.se->getName() << "\t"
-                 << acr << std::right << std::setw(20) << "ID : " << std::left << acfy << std::right << std::setw(10) << user.se->getID() << acr << endl;
-
-            cout << "# Rented Cars : " << acfg << std::left << std::setw(30) << user.se->rentedCars.size() << "\t"
-                 << acr << std::right << std::setw(20) << "Payment Due : " << std::left << acfr << std::right << std::setw(10) << std::fixed << std::setprecision(2) << user.se->due << acr << endl;
-
-            if (user.se->rentedCars.size() > 0) cout << "\nCars Rented ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n\n";
-                                                          
-            for (auto car : user.se->rentedCars) {
-                cout << "Model : " << acfy << std::left << std::setw(22) << car->getModel()
-                     << std::right << std::setw(21) << acr << "Registration No. : " << acfy << std::setw(12) << car->getRegNo() << acr << endl;
-                cout << "Condition : " << acfg << std::left << std::setw(5);
-
-                float cond = car->getCondition();
-
-                if (cond < 30)
-                    cout << acfr;
-                else if (cond < 60)
-                    cout << acfy;
-                else
-                    cout << acfg;
-
-                cout << std::setprecision(2) << car->getCondition() << acr << "\t"
-                     << std::right << std::setw(27) << acr << "Due Date : " << acfg << std::setw(20) << car->getDueDate() << acr << endl;
-                cout << endl;
-            }
-        }
-    cout << dottedred;
-
-    }
 }
 
-void God::showAllCars() {
+void DBMgr::showAllCars() {
     for (auto car : Cars) {
         cout << dottedred;
         cout << "Registration No. : " << car.se->getRegNo() << "\n";
@@ -132,14 +141,16 @@ void God::showAllCars() {
         cout << "Rented : " << (car.se->getisRented() ? "YES" : "NO") << "\n";
         if (car.se->getisRented() == 1) {
             cout << "Renter ID : " << car.se->getRenterID() << "\n";
-            if(Customers.find(ID) != Customers.end()) cout << "Renter Name : " << Customers[car.se->getRenterID()]->getName() << "\n";
-            else cout << "Renter Name : " << Employees[car.se->getRenterID()]->getName() << "\n";
+            if (Customers.find(ID) != Customers.end())
+                cout << "Renter Name : " << Customers[car.se->getRenterID()]->getName() << "\n";
+            else
+                cout << "Renter Name : " << Employees[car.se->getRenterID()]->getName() << "\n";
             cout << "Due Date : " << car.se->getDueDate() << "\n";
         }
     }
 }
 
-void God::showAllCarsSecure() {
+void DBMgr::showAllCarsSecure() {
     for (auto car : Cars) {
         cout << dottedred;
         cout << "Model : " << acfy << std::setw(30) << car.se->getModel() << acr << "\t\tRegistration No. : " << acfy << car.se->getRegNo() << acr << "\n";
@@ -154,10 +165,12 @@ void God::showAllCarsSecure() {
             cout << acfg;
 
         cout << std::setw(26) << car.se->getCondition() << acr << "\t\tAvailable : ";
-        if(car.se->getisRented() == 1) {
-            cout << acfr << "NO\n" << acr;
+        if (car.se->getisRented() == 1) {
+            cout << acfr << "NO\n"
+                 << acr;
         } else {
-            cout << acfg << "YES\n" << acr;
+            cout << acfg << "YES\n"
+                 << acr;
         }
 
         if (car.se->getisRented() == 1) {
@@ -166,12 +179,14 @@ void God::showAllCarsSecure() {
     }
 }
 
-bool God::findUser(std::string ID) {
-    if(Customers.find(ID) != Customers.end() || Employees.find(ID) != Employees.end()) return true;
-    else return false;
+bool DBMgr::findUser(std::string ID) {
+    if (Customers.find(ID) != Customers.end() || Employees.find(ID) != Employees.end())
+        return true;
+    else
+        return false;
 }
 
-bool God::findUserbyName(std::string name) {
+bool DBMgr::findUserbyName(std::string name) {
     for (auto user : Customers) {
         std::string s = user.se->getName();
 
@@ -197,8 +212,8 @@ bool God::findUserbyName(std::string name) {
     return false;
 }
 
-User *God::getUserbyName(std::string name) {
-    if(findUserbyName(name)) {
+User *DBMgr::getUserbyName(std::string name) {
+    if (findUserbyName(name)) {
         for (auto user : Customers) {
             std::string s = user.se->getName();
 
@@ -220,15 +235,13 @@ User *God::getUserbyName(std::string name) {
                 return Employees[user.se->getID()];
             }
         }
-    }
-    else
-    {
+    } else {
         cout << "User not found!" << endl;
         return NULL;
     }
 }
 
-bool God::findCarbyModel(std::string model) {
+bool DBMgr::findCarbyModel(std::string model) {
     for (auto car : Cars) {
         std::string s = car.se->getModel();
 
@@ -242,7 +255,7 @@ bool God::findCarbyModel(std::string model) {
     return false;
 }
 
-Car *God::getCarbyModel(std::string model) {
+Car *DBMgr::getCarbyModel(std::string model) {
     for (auto car : Cars) {
         std::string s = car.se->getModel();
 
@@ -255,45 +268,49 @@ Car *God::getCarbyModel(std::string model) {
     }
 }
 
-bool God::findCar(std::string regNo) {
+bool DBMgr::findCar(std::string regNo) {
     return Cars.find(regNo) != Cars.end();
 }
 
-bool God::login(std::string ID, std::string password) {
+bool DBMgr::login(std::string ID, std::string password) {
     if (findUser(ID)) {
-        if(Customers.find(ID) != Customers.end()) return Customers[ID]->getPassword() == password;
-        else return Employees[ID]->getPassword() == password;
+        if (Customers.find(ID) != Customers.end())
+            return Customers[ID]->getPassword() == password;
+        else
+            return Employees[ID]->getPassword() == password;
     } else {
         return false;
     }
 }
 
-User *God::getUser(std::string ID) {
-    if(Customers.find(ID) != Customers.end()) return Customers[ID];
-    else return Employees[ID];
+User *DBMgr::getUser(std::string ID) {
+    if (Customers.find(ID) != Customers.end())
+        return Customers[ID];
+    else
+        return Employees[ID];
 }
 
-Customer *God::getCustomer(std::string ID) {
+Customer *DBMgr::getCustomer(std::string ID) {
     return Customers[ID];
 }
 
-Employee* God::getEmployee(std::string ID) {
+Employee *DBMgr::getEmployee(std::string ID) {
     return Employees[ID];
 }
 
-Car *God::getCar(std::string regNo) {
+Car *DBMgr::getCar(std::string regNo) {
     return Cars[regNo];
 }
 
-std::map<std::string, Customer*> God::getCustomers() {
+std::map<std::string, Customer *> DBMgr::getCustomers() {
     return Customers;
 }
 
-std::map<std::string, Employee*> God::getEmployees() {
+std::map<std::string, Employee *> DBMgr::getEmployees() {
     return Employees;
 }
 
-std::map<std::string, Car*> God::getCars() {
+std::map<std::string, Car *> DBMgr::getCars() {
     return Cars;
 }
 
@@ -351,7 +368,7 @@ void User::returnCar(Car *car) {
     }
 }
 
-void User::showMyCars(God *God) {
+void User::showMyCars(DBMgr *DBMgr) {
     if (rentedCars.size() == 0) {
         cout << acfr << "You have not rented any cars!" << endl;
 
@@ -374,7 +391,7 @@ void User::showMyCars(God *God) {
             cout << acfg;
 
         cout << car->getCondition() << acr << "\n";
-        car->updateRentDate(God->getCar(car->getRegNo())->getRentDate());
+        car->updateRentDate(DBMgr->getCar(car->getRegNo())->getRentDate());
         cout << "Due Date : " << car->getDueDate() << "\n";
     }
 
