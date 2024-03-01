@@ -56,7 +56,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
             // Registration
             std::string Name, ID, password;
             cout << "Hi! Please Enter your Name: " << endl;
-            // cin.ignore();
+            cin.ignore();
             getline(cin, Name);
 
             bool unique_ID = false;
@@ -84,11 +84,11 @@ void Login(God* God, User* currentUser, bool& isRunning) {
             password = getPassword();
 
             if (role[0] == 'c' || role[0] == 'C') {
-                User* newUser = (User *) new Customer(Name, ID, password);
-                God->addUser(newUser);
+                Customer* newUser = new Customer(Name, ID, password);
+                God->addCustomer(newUser);
             } else if (role[0] == 'e' || role[0] == 'E') {
-                User* newUser = (User *) new Employee(Name, ID, password);
-                God->addUser(newUser);
+                Employee* newUser = new Employee(Name, ID, password);
+                God->addEmployee(newUser);
             }
 
             currentUser = God->getUser(ID);
@@ -117,7 +117,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                     continue;
                 }
 
-                cout << "Enter your password: ";
+                cout << "Enter your password: " << endl;
                 password = getPassword();
                 // password = "gg";
 
@@ -239,15 +239,27 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                             car->updateRentDate(rentDate);
                             car->updateExpectedDays(days);
 
-                            car->getDetails();
+                            // car->getDetails();
                             
+                            God->updateCar(car);
+
                             currentUser->rentCar(car);
                             currentUser->addRent(car);
 
-                            God->updateCar(car);
-                            God->updateUser(currentUser);
+                            if(role[0] == 'c') 
+                            {
+                                Customer* c = dynamic_cast<Customer*>(currentUser);
+                                God->updateCustomer(c);
+                            }
+                            else if(role[0] == 'e')
+                            {
+                                Employee* e = dynamic_cast<Employee*>(currentUser);
+                                God->updateEmployee(e);
+                            }
 
+                            cout << dottedgreen;
                             God->getCar(regNo)->getDetails();
+                            cout << dottedgreen;
 
                         } else {
                             cout << acfr "Car not found! " << acr << "Please recheck details." << endl;
@@ -262,7 +274,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                 }
                 case 2: {
                     cout << "Rented cars: " << endl;
-                    currentUser->showMyCars();
+                    currentUser->showMyCars(God);
 
                     God->exportData();
                     God->importData();
@@ -281,7 +293,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                     cin >> (rent);
 
                     if (rent[0] == 'y' || rent[0] == 'Y') {
-                        currentUser->showMyCars();
+                        currentUser->showMyCars(God);
                         pak2c();
                     }
 
@@ -308,10 +320,6 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         cout << "Either choose to enter the return date (d) or the number of days (n) you rented the car for: ";
                         std::string choice;
                         cin >> choice;
-
-                        cout << "###################\n";
-                        cout << God->getCar(regNo)->getRentDateString();
-                        cout << "###################\n";
 
                         Date actualReturnDate;
                         int days;
@@ -411,7 +419,17 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         currentUser->returnCar(car);
 
                         God->updateCar(car);
-                        God->updateUser(currentUser);
+                        
+                        if(role[0] == 'c') 
+                        {
+                            Customer* c = dynamic_cast<Customer*>(currentUser);
+                            God->updateCustomer(c);
+                        }
+                        else if(role[0] == 'e')
+                        {
+                            Employee* e = dynamic_cast<Employee*>(currentUser);
+                            God->updateEmployee(e);
+                        }
 
                     } else {
                         cout << acfr "Car not found! " << acr << "Please recheck details." << endl;
@@ -474,7 +492,16 @@ void Login(God* God, User* currentUser, bool& isRunning) {
 
                     currentUser->setRecord(newRec);
 
-                    God->updateUser(currentUser);
+                    if(role[0] == 'c') 
+                    {
+                        Customer* c = dynamic_cast<Customer*>(currentUser);
+                        God->updateCustomer(c);
+                    }
+                    else if(role[0] == 'e')
+                    {
+                        Employee* e = dynamic_cast<Employee*>(currentUser);
+                        God->updateEmployee(e);
+                    }
 
                     God->exportData();
                     God->importData();
@@ -555,14 +582,15 @@ void Login(God* God, User* currentUser, bool& isRunning) {
 
                         cout << "Do you want to search by Registration No. or Model? (r/m): ";
                         cin >> (action);
+
                         if (action[0] == 'r' || action[0] == 'R') {
                             flag = 0;
-                            cout << "Enter the registration number of the car you want to search: ";
+                            cout << "Enter the registration number of the car you want to search: " << endl;
                             cin >> (regNo);
                         } else if (action[0] == 'm' || action[0] == 'M') {
                             flag = 1;
-                            cout << "Enter the model of the car you want to search: ";
-                            // cin.ignore();
+                            cout << "Enter the model of the car you want to search: " << endl;
+                            cin.ignore();
                             getline(cin, model);
                         }
 
@@ -601,7 +629,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
 
                         if (action[0] == 'i' || action[0] == 'I') {
                             flag = 0;
-                            cout << "Enter the ID of the customer you want to search: ";
+                            cout << "Enter the ID of the customer you want to search: " << endl;
                             cin >> (ID);
 
                             if (cin.fail()) {
@@ -613,8 +641,8 @@ void Login(God* God, User* currentUser, bool& isRunning) {
 
                         } else {
                             flag = 1;
-                            cout << "Enter the Name of the customer you want to search: ";
-                            // cin.ignore();
+                            cout << "Enter the Name of the customer you want to search: " << endl;
+                            cin.ignore();
                             getline(cin, name);
                         }
 
@@ -632,7 +660,21 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         } else {
                             cout << acfr << "User not found! " << acr << "Please recheck details." << endl;
                             cout << "But here are the closest matches: " << endl;
-                            for (auto user : God->getUsers()) {
+
+                            for (auto user : God->getCustomers()) {
+                                std::string IDU = user.se->getID();
+                                std::string nameU = user.se->getName();
+
+                                transform(IDU.begin(), IDU.end(), IDU.begin(), ::toupper);
+                                transform(nameU.begin(), nameU.end(), nameU.begin(), ::toupper);
+
+                                if (((IDU.find(ID) != std::string::npos) && flag == 0) || ((nameU.find(name) != std::string::npos) && flag == 1)) {
+                                    cout << dottedred;
+                                    user.se->getDetails();
+                                }
+                            }
+
+                            for (auto user : God->getEmployees()) {
                                 std::string IDU = user.se->getID();
                                 std::string nameU = user.se->getName();
 
@@ -653,7 +695,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
 
                         if (action[0] == 'i' || action[0] == 'I') {
                             flag = 0;
-                            cout << "Enter the ID of the employee you want to search: ";
+                            cout << "Enter the ID of the employee you want to search: " << endl;
                             cin >> (ID);
 
                             if (cin.fail()) {
@@ -665,8 +707,8 @@ void Login(God* God, User* currentUser, bool& isRunning) {
 
                         } else {
                             flag = 1;
-                            cout << "Enter the Name of the employee you want to search: ";
-                            // cin.ignore();
+                            cout << "Enter the Name of the employee you want to search: " << endl;
+                            cin.ignore();
                             getline(cin, name);
                         }
 
@@ -684,7 +726,8 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         } else {
                             cout << acfr << "User not found! " << acr << "Please recheck details." << endl;
                             cout << "But here are the closest matches: " << endl;
-                            for (auto user : God->getUsers()) {
+
+                            for (auto user : God->getCustomers()) {
                                 std::string IDU = user.se->getID();
                                 std::string nameU = user.se->getName();
 
@@ -696,6 +739,20 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                                     user.se->getDetails();
                                 }
                             }
+
+                            for (auto user : God->getEmployees()) {
+                                std::string IDU = user.se->getID();
+                                std::string nameU = user.se->getName();
+
+                                transform(IDU.begin(), IDU.end(), IDU.begin(), ::toupper);
+                                transform(nameU.begin(), nameU.end(), nameU.begin(), ::toupper);
+
+                                if (((IDU.find(ID) != std::string::npos) && flag == 0) || ((nameU.find(name) != std::string::npos) && flag == 1)) {
+                                    cout << dottedred;
+                                    user.se->getDetails();
+                                }
+                            }
+
                         }
                     } else {
                         clearScreen();
@@ -727,11 +784,11 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         bool isRented;
                         int expectedDays;
 
-                        cout << "Enter the car model: ";
-                        // cin.ignore();
+                        cout << "Enter the car model: " << endl;
+                        cin.ignore();
                         getline(cin, model);
 
-                        cout << "Enter the registration number: ";
+                        cout << "Enter the registration number: " << endl;
                         cin >> (regNo);
 
                         std::transform(regNo.begin(), regNo.end(), regNo.begin(), ::toupper);
@@ -891,9 +948,20 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         God->updateCar(car);
 
                         if (isRented) {
-                            User* user = God->getUser(renterID);
-                            user->addRent(car);
-                            God->updateUser(user);
+                            if(God->getCustomers().find(renterID) != God->getCustomers().end())
+                            {
+                                Customer* user = dynamic_cast<Customer*>(God->getCustomers()[renterID]);
+                                user->rentCar(car);
+                                user->addRent(car);
+                                God->updateCustomer(user);
+                            }
+                            else if(God->getEmployees().find(renterID) != God->getEmployees().end())
+                            {
+                                Employee* user = dynamic_cast<Employee*>(God->getEmployees()[renterID]);
+                                user->rentCar(car);
+                                user->addRent(car);
+                                God->updateEmployee(user);
+                            }
                         }
 
                     } else if (action[0] == 'd' || action[0] == 'D') {
@@ -950,8 +1018,8 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         Customer* customer;
                         std::string CName, CID, CPassword;
 
-                        cout << "Enter the customer's Name: ";
-                        // cin.ignore();
+                        cout << "Enter the customer's Name: " << endl;
+                        cin.ignore();
                         getline(cin, CName);
 
                         bool unique_ID = false;
@@ -988,7 +1056,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         cin >> (confirm);
 
                         if (confirm[0] == 'y' || confirm[0] == 'Y') {
-                            God->addUser(customer);
+                            God->addCustomer(customer);
                             cout << "Customer added successfully." << endl;
                         }
 
@@ -1029,7 +1097,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
 
                         if (confirm[0] == 'y' || confirm[0] == 'Y') {
                             *customer = Customer(God->getUser(ID)->getName(), ID, password);
-                            God->updateUser(customer);
+                            God->updateCustomer(customer);
                         }
 
                     } else if (action[0] == 'd' || action[0] == 'D') {
@@ -1064,7 +1132,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         cin >> (confirm);
 
                         if (confirm[0] == 'y' || confirm[0] == 'Y') {
-                            God->removeUser(God->getUser(ID));
+                            God->removeCustomer(God->getCustomer(ID));
                             cout << "Customer deleted successfully." << endl;
                         }
 
@@ -1095,8 +1163,8 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         Employee* employee;
                         std::string EName, EID, EPassword;
 
-                        cout << "Enter the employee's Name: ";
-                        // cin.ignore();
+                        cout << "Enter the employee's Name: " << endl;
+                        cin.ignore();
                         getline(cin, EName);
 
                         bool unique_ID = false;
@@ -1133,7 +1201,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         cin >> (confirm);
 
                         if (confirm[0] == 'y' || confirm[0] == 'Y') {
-                            God->addUser(employee);
+                            God->addEmployee(employee);
                             cout << "Employee added successfully." << endl;
                         }
 
@@ -1168,7 +1236,7 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                         }
 
                         *employee = Employee(God->getUser(ID)->getName(), ID, password);
-                        God->updateUser(employee);
+                        God->updateEmployee(employee);
 
                     } else if (action[0] == 'd' || action[0] == 'D') {
                         // Delete an employee
@@ -1195,13 +1263,19 @@ void Login(God* God, User* currentUser, bool& isRunning) {
                             break;
                         }
 
+                        if(God->getEmployee(ID)->memberType == "Manager")
+                        {
+                            cout << acfr << "Cannot delete the Manager!" << acr << endl;
+                            break;
+                        }
+
                         cout << "Are you sure you want to delete this employee? (y/n): ";
                         employee->getDetails();
                         std::string confirm;
                         cin >> (confirm);
 
                         if (confirm[0] == 'y' || confirm[0] == 'Y') {
-                            God->removeUser(God->getUser(ID));
+                            God->removeEmployee(God->getEmployee(ID));
                             cout << "Employee deleted successfully." << endl;
                         }
 
@@ -1238,7 +1312,8 @@ void Login(God* God, User* currentUser, bool& isRunning) {
 
 //// Storage for static members     //////////////////////////////////////
 
-std::map<std::string, User*> God::Users;
+std::map<std::string, Customer*> God::Customers;
+std::map<std::string, Employee*> God::Employees;
 std::map<std::string, Car*> God::Cars;
 
 //// Main Function                  //////////////////////////////////////

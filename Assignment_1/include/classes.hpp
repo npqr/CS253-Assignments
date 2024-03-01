@@ -99,7 +99,7 @@ class User {
     void returnCar(Car* car);
     void setRecord(double newRecord) { record = newRecord; }
 
-    void showMyCars();
+    void showMyCars(God* God);
 
     void operator= (const User* other) {
         name = other->name;
@@ -238,20 +238,27 @@ class Car {
 
 class God {
    protected:
+    static std::map<std::string, Customer*> Customers;
+    static std::map<std::string, Employee*> Employees;
+    static std::map<std::string, Car*> Cars;
 
    public:
-    static std::map<std::string, User*> Users;
-    static std::map<std::string, Car*> Cars;
+
+    God(){};
+
     bool findUser(std::string ID);
     bool findUserbyName(std::string name);
     User* getUserbyName(std::string name);
     bool findCar(std::string regNo);
+    User* getUser(std::string ID);
 
-    God(){};
+    void addCustomer(Customer* customer);
+    void updateCustomer(Customer* customer);
+    void removeCustomer(Customer* customer);
 
-    void addUser(User* user);
-    void updateUser(User* user);
-    void removeUser(User* user);
+    void addEmployee(Employee* employee);
+    void updateEmployee(Employee* employee);
+    void removeEmployee(Employee* employee);
 
     bool findCarbyModel(std::string model);
     Car* getCarbyModel(std::string model);
@@ -267,15 +274,16 @@ class God {
     bool login(std::string ID, std::string password);
     void logout();
 
-    User* getUser(std::string ID);
+    Customer* getCustomer(std::string ID);
+    Employee* getEmployee(std::string ID);
     Car* getCar(std::string regNo);
 
-    std::map<std::string, User*> getUsers();
+    std::map<std::string, Customer*> getCustomers();
+    std::map<std::string, Employee*> getEmployees();
     std::map<std::string, Car*> getCars();
 
     static void importData();
     static void exportData();
-    static void sanitizeData();
 };
 
 //// Manager Class                //////////////////////////////////////
