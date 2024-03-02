@@ -83,8 +83,6 @@ class Date {
 
 class User {
    protected:
-
-   public:
     std::string name = "";
     std::string ID = "";
     std::string password = "";
@@ -93,11 +91,14 @@ class User {
     std::vector<Car*> rentedCars;
     int rentLimit = 5;
 
+   public:
+
     void getDues(int today);
     void clearDues() { due = 0.0; }
     void rentCar(Car* car);
     void returnCar(Car* car);
     void setRecord(double newRecord) { record = newRecord; }
+    void setRentLimit(int newLimit) { rentLimit = newLimit; }
 
     void showMyCars(DBMgr* DBMgr);
 
@@ -112,6 +113,8 @@ class User {
 
     double getRecord() const { return record; }
     double getDue() const { return due; }
+    double getRentLimit() const { return rentLimit; }
+
     std::vector<Car*> getRentedCars() { return rentedCars; }
     void addFine(double fine) { due += fine; }
     void clearPartialDues(double amount) { addFine(-amount);}
@@ -149,6 +152,14 @@ class Customer : public User {
         memberType = "Customer";
     }
 
+    Customer(const std::string name, std::string ID, const std::string password, double record, double due, int rentLimit)
+        : User(name, ID, password) {
+        memberType = "Customer";
+        this->record = record;
+        this->due = due;
+        this->rentLimit = rentLimit;
+    }
+
     Customer() {};
 
     void getRentedCars();
@@ -162,6 +173,14 @@ class Employee : public User {
     Employee(const std::string name, std::string ID, const std::string password)
         : User(name, ID, password) {
         memberType = "Employee";
+    }
+
+    Employee(const std::string name, std::string ID, const std::string password, double record, double due, int rentLimit)
+        : User(name, ID, password) {
+        memberType = "Employee";
+        this->record = record;
+        this->due = due;
+        this->rentLimit = rentLimit;
     }
 
     Employee() {};

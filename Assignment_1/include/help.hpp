@@ -67,6 +67,12 @@ void clearScreen() {
     cout << endl;
 }
 
+void cinc() {
+    cin.clear();
+    cin.ignore(1000, '\n');
+    cout << acfr << "Invalid input. Please try again." << acr << endl;
+}
+
 void pak2c() {
     cout << "Press any key to continue... ";
     getchar();

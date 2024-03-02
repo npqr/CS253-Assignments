@@ -55,10 +55,55 @@
 ## Few Assumptions and Concerns
 
 - The maximum days for which a car can be rented is 15
-- The maximum number of cars that can be rented by a customer at a time is by-default (RentLimit), which can be altered
+- The maximum number of cars that can be rented by a customer at a time is by-default (RentLimit), which can be altered, and it also gets updated as and when the customer returns the car, depending on the customer record
 - The database, as stored in a JSON file, is encoded in a specific manner, and thus, the file should not be tampered with manually. Othewise, the system may crash
 - By-default, record of each Customer and Employee is initialised a `75.0` which is updated as and whem the user pays dues, returns the car, etc depending on the car condition and other factors
 - It is assumed that the condition of car can not be more than what it was initially, except when updated by the Manager (simiulating repair)
 - The login credentials are case-sensitive. Also, they can be accessed directly from the JSON file. A hashing mechanism can be implemented, though
 - Note : Abrupt termination of the program may lead to loss of data, as the data is stored in a JSON file, and is updated as and when the program is run
+- Also, in most cases, the input is sanitised, but the system may crash sometimes if the input is unexpected (e.g. a <kbd>Ctrl + Z</kbd> key-stroke)
 - The system also detects your environment of operations and implements the platfrom-dependent functions accordingly e.g. for clearing screen and sleep function etc
+- We have assumed that the default date for non-rented cars is `1/1/2001` and for rented cars, it is the date of rent
+
+
+## Sample (initial) DB
+
+### CarsDB
+
+| | | | | | | | |
+|-|-|-|-|-|-|-|-|
+|cars| | | | | | | |
+|condition|dailyRent|expectedDays|isRented|model|regNo|rentDate|renterID|
+|74.0|2500.0|5|TRUE|Lightning McQueen|MCQRCR|12/2/2023|gotham|
+|60.0|2000.0|5|FALSE|Tow Mater|TOWM8R|1/1/2001||
+|86.0|3500.0|5|FALSE|Batmobile|BATMAN|1/1/2001||
+|43.0|1500.0|5|FALSE|Optimus Prime|OPTIMUS|1/1/2001||
+|72.0|4000.0|5|FALSE|Bumblebee|BBBEE|1/1/2001||
+
+
+### CustomersDB
+
+| | | | | | | | |
+|-|-|-|-|-|-|-|-|
+|customers| | | | | | | |
+|ID|due|memberType|name|password|record|rentLimit|rentedCars|
+|sheldont|0.0|Customer|Sheldon Cooper|bazinga|71.6|5| |
+|breakingbad|0.0|Customer|Walter White|wizwhite|75.0|5| |
+|dp|0.0|Customer|Deadpool|regenerate|71.0|3| |
+|captain|0.0|Customer|Jack Sparrow|blackpearl|75.0|5| |
+|spidey|0.0|Customer|Peter Parker|mjw|75.0|5| |
+
+
+### EmployeesDB
+
+| | | | | | | | | | | | | | | |
+|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
+|employees| | | | | | | | | | | | | | |
+|ID|due|memberType|name|password|record|rentLimit|rentedCars| | | | | | | |
+| | | | | | | |condition|dailyRent|expectedDays|isRented|model|regNo|rentDate|renterID|
+|007|0.0|Employee|James Bond|bond007|75.0|5| | | | | | | | |
+|mindpalace|0.0|Employee|Sherlock Holmes|elementary|75.0|5| | | | | | | | |
+|apple|0.0|Employee|Isaac Newton|gravity|75.0|5| | | | | | | | |
+|gotham|12500.0|Employee|Bruce Wayne|batman|60.3|5|74.0|2500.0|5|TRUE|Lightning McQueen|MCQRCR|12/2/2023|gotham|
+|ron302|0.0|Employee|Hermione Granger|leviosa|75.0|5| | | | | | | | |
+|jarvis|0.0|Manager|Tony Stark|jarvis|75.0|5| | | | | | | | |

@@ -22,6 +22,11 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
 
     while ((action[0] != 'r') || (action[0] != 'l') || (action[0] != 'q') || (action[0] != 'R') || (action[0] != 'L') || (action[0] != 'Q')) {
         cin >> (action);
+        if (cin.fail()) {
+            
+            continue;
+        }
+
         if (action[0] == 'q' || action[0] == 'Q') {
             isRunning = false;
             return;
@@ -62,12 +67,7 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                 cout << "Enter an ID: ";
                 cin >> (ID);
 
-                if (cin.fail()) {
-                    cin.clear();
-                    cin.ignore(1000, '\n');
-                    cout << acfr << "Invalid input. Please try again." << acr << endl;
-                    continue;
-                }
+                if (cin.fail()) {cinc(); continue;}
 
                 // check if ID already exists
 
@@ -108,12 +108,7 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                 cin >> (ID);
                 // ID = "peter101";
 
-                if (cin.fail()) {
-                    cin.clear();
-                    cin.ignore(1000, '\n');
-                    cout << acfr << "Invalid input. Please try again." << acr << endl;
-                    continue;
-                }
+                if (cin.fail()) {cinc(); continue;}
 
                 cout << "Enter your password: " << endl;
                 password = getPassword();
@@ -177,14 +172,8 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
             cout << "Enter your choice: ";
             cin >> choice;
 
-            if (cin.fail()) {
-                cin.clear();
-                cin.ignore(1000, '\n');
+            if (cin.fail()) {cinc(); continue;}
 
-                clearScreen();
-                cout << acfr << "Invalid input. Please try again." << acr << endl;
-                continue;
-            }
 
             // Process user's choice
             std::string rent, regNo;
@@ -265,6 +254,12 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                         } else {
                             cout << acfr "Car not found! " << acr << "Please recheck details." << endl;
                         }
+                    } else if (rent[0] == 'n' || rent[0] == 'N') {
+                        pak2c();
+                        break;
+                    } else {
+                        cout << acfr << "Invalid input. Please try again." << acr << endl;
+                        continue;
                     }
 
                     DBMgr->exportData();
@@ -296,6 +291,12 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                     if (rent[0] == 'y' || rent[0] == 'Y') {
                         currentUser->showMyCars(DBMgr);
                         pak2c();
+                    } else if (rent[0] == 'n' || rent[0] == 'N') {
+                        pak2c();
+                        break;
+                    } else {
+                        cout << acfr << "Invalid input. Please try again." << acr << endl;
+                        continue;
                     }
 
                     cout << "Enter the registration number of the car you want to return: ";
@@ -345,9 +346,11 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                                 break;
                             }
 
-                        } else {
+                        } else if (choice[0] == 'n' || choice[0] == 'N') {
                             cout << "How many days did you (actually) rent the car for? ";
                             cin >> days;
+
+                            if (cin.fail()) {cinc(); continue;}
                         }
 
                         if (days > 15) {
@@ -403,6 +406,14 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                                 fine = 2000.0;
                             else
                                 fine *= (1 + 1 - diffcondition / 100.0);
+                            cout << acfr << "Your rent limit has been decreased by 1." << acr << endl;
+                            currentUser->setRentLimit(currentUser->getRentLimit() - 1);
+                            if(currentUser->getRentLimit() < 0) currentUser->setRentLimit(0);
+
+                            if(currentUser->getRentLimit() < currentUser->getRentedCars().size()) {
+                                cout << acfr << "You have exceeded your rent limit. Please clear dues to rent more cars, or contact Manager." << acr << endl;
+                            }
+
                         } else if (diffcondition <= 5) {
                             cout << "The car is in " << acfg << "good" << acr << " condition." << endl;
                             int random = rand() % 10 + 1;
@@ -411,6 +422,9 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
 
                             cout << "This also means that your record will be improved by " << acfg << random / 4 << acr << " points!" << endl;
                             currentUser->setRecord(currentUser->getRecord() + random / 4);
+
+                            cout << acfg << "Your rent limit has been increased by 1." << acr << endl;
+                            currentUser->setRentLimit(currentUser->getRentLimit() + 1);
                         } else {
                             cout << "The car is in " << acfy << "average" << acr << " condition." << endl;
                         }
@@ -549,15 +563,7 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
             cout << "Enter your choice: ";
             cin >> choice;
 
-            if (cin.fail()) {
-                cin.clear();
-
-                cin.ignore(1000, '\n');
-
-                clearScreen();
-                cout << acfr << "Invalid input. Please try again." << acr << endl;
-                continue;
-            }
+            if (cin.fail()) {cinc(); continue;}
 
             // Process user's choice
             std::string action, view;
@@ -590,6 +596,9 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                             cout << "Enter the model of the car you want to search: " << endl;
 
                             cin >> (model);
+                        } else {
+                            cout << acfr << "Invalid input. Please try again." << acr << endl;
+                            continue;
                         }
 
                         std::transform(regNo.begin(), regNo.end(), regNo.begin(), ::toupper);
@@ -630,12 +639,7 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                             cout << "Enter the ID of the customer you want to search: " << endl;
                             cin >> (ID);
 
-                            if (cin.fail()) {
-                                cin.clear();
-                                cin.ignore(1000, '\n');
-                                cout << acfr << "Invalid input. Please try again." << acr << endl;
-                                continue;
-                            }
+                        if (cin.fail()) {cinc(); continue;}
 
                         } else {
                             flag = 1;
@@ -695,12 +699,7 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                             cout << "Enter the ID of the employee you want to search: " << endl;
                             cin >> (ID);
 
-                            if (cin.fail()) {
-                                cin.clear();
-                                cin.ignore(1000, '\n');
-                                cout << acfr << "Invalid input. Please try again." << acr << endl;
-                                continue;
-                            }
+                        if (cin.fail()) {cinc(); continue;}
 
                         } else {
                             flag = 1;
@@ -768,6 +767,11 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                     if (view[0] == 'y' || view[0] == 'Y') {
                         DBMgr->showAllCars();
                         cout << dottedred;
+                    } else if (view[0] == 'n' || view[0] == 'N') {
+                        pak2c();
+                    } else {
+                        cout << acfr << "Invalid input. Please try again." << acr << endl;
+                        continue;
                     }
 
                     if (action[0] == 'a' || action[0] == 'A') {
@@ -780,7 +784,6 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                         int expectedDays;
 
                         cout << "Enter the car model: " << endl;
-
                         cin >> (model);
 
                         cout << "Enter the registration number: " << endl;
@@ -873,6 +876,12 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                                 renter->addRent(car);
                                 DBMgr->updateUser(renter);
                             }
+                        } else if (confirm[0] == 'n' || confirm[0] == 'N') {
+                            pak2c();
+                            break;
+                        } else {
+                            cout << acfr << "Invalid input. Please try again." << acr << endl;
+                            continue;
                         }
 
                     } else if (action[0] == 'u' || action[0] == 'U') {
@@ -1023,6 +1032,11 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                     if (view[0] == 'y' || view[0] == 'Y') {
                         DBMgr->showAllUsers("Customer");
                         cout << dottedred;
+                    } else if (view[0] == 'n' || view[0] == 'N') {
+                        pak2c();
+                    } else {
+                        cout << acfr << "Invalid input. Please try again." << acr << endl;
+                        continue;
                     }
 
                     cout << "Do you want to add, update or delete a customer? (or neither) (a/u/d/n): ";
@@ -1041,12 +1055,7 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                             cout << "Enter a ID: ";
                             cin >> (CID);
 
-                            if (cin.fail()) {
-                                cin.clear();
-                                cin.ignore(1000, '\n');
-                                cout << acfr << "Invalid input. Please try again." << acr << endl;
-                                continue;
-                            }
+                            if (cin.fail()) {cinc(); continue;}
 
                             // check if ID already exists
 
@@ -1084,16 +1093,12 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                         Customer* customer;
                         std::string Name, ID, password;
                         std::string act;
+                        double record, dues, rentLimit;
 
                         cout << "Enter the ID of the customer you want to update: ";
                         cin >> (ID);
 
-                        if (cin.fail()) {
-                            cin.clear();
-                            cin.ignore(1000, '\n');
-                            cout << acfr << "Invalid input. Please try again." << acr << endl;
-                            continue;
-                        }
+                        if (cin.fail()) {cinc(); continue;}
 
                         if (!DBMgr->findUser(ID)) {
                             cout << acfr << "Customer not found!" << acr << "Please enter corrrect ID." << endl;
@@ -1106,6 +1111,8 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                         if (act[0] == 'y' || act[0] == 'Y') {
                             cout << "Enter the new name: ";
                             cin >> (Name);
+                        } else {
+                            Name = DBMgr->getCustomer(ID)->getName();
                         }
 
                         cout << "Do you want to update the password? (y/n): ";
@@ -1114,6 +1121,47 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                         if (act[0] == 'y' || act[0] == 'Y') {
                             cout << "Enter the new password: ";
                             password = getPassword();
+                        } else {
+                            password = DBMgr->getCustomer(ID)->getPassword();
+                        }
+
+                        cout << "Do you want to update the record? (y/n): ";
+                        cin >> (act);
+
+                        if (act[0] == 'y' || act[0] == 'Y') {
+                            cout << "Enter the new record: ";
+                            cin >> record;
+
+                            if (cin.fail()) {cinc(); continue;}
+
+                        } else {
+                            record = DBMgr->getCustomer(ID)->getRecord();
+                        }
+
+                        cout << "Do you want to update the dues? (y/n): ";
+                        cin >> (act);
+
+                        if (act[0] == 'y' || act[0] == 'Y') {
+                            cout << "Enter the new dues: ";
+                            cin >> dues;
+
+                            if (cin.fail()) {cinc(); continue;}
+
+                        } else {
+                            dues = DBMgr->getCustomer(ID)->getDue();
+                        }
+
+                        cout << "Do you want to update the rent limit? (y/n): ";
+                        cin >> (act);
+
+                        if (act[0] == 'y' || act[0] == 'Y') {
+                            cout << "Enter the new rent limit: ";
+                            cin >> rentLimit;
+
+                            if (cin.fail()) {cinc(); continue;}
+
+                        } else {
+                            rentLimit = DBMgr->getCustomer(ID)->getRentLimit();
                         }
 
                         cout << "Are you sure you want to update this customer? (y/n): ";
@@ -1121,7 +1169,7 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                         cin >> (confirm);
 
                         if (confirm[0] == 'y' || confirm[0] == 'Y') {
-                            Customer nC = Customer(Name, ID, password);
+                            Customer nC = Customer(Name, ID, password, record, dues, rentLimit);
                             customer = &nC;
 
                             cout << dottedgreen;
@@ -1143,12 +1191,7 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                         cout << "Enter the ID of the customer you want to delete: ";
                         cin >> (ID);
 
-                        if (cin.fail()) {
-                            cin.clear();
-                            cin.ignore(1000, '\n');
-                            cout << acfr << "Invalid input. Please try again." << acr << endl;
-                            continue;
-                        }
+                        if (cin.fail()) {cinc(); continue;}
 
                         if (ID == currentUser->getID()) {
                             cout << acfr << "Sorry! Please don't delete yourself! :/" << acr << endl;
@@ -1216,6 +1259,11 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                     if (view[0] == 'y' || view[0] == 'Y') {
                         DBMgr->showAllUsers("Employee");
                         cout << dottedred;
+                    } else if (view[0] == 'n' || view[0] == 'N') {
+                        pak2c();
+                    } else {
+                        cout << acfr << "Invalid input. Please try again." << acr << endl;
+                        continue;
                     }
 
                     cout << "Do you want to add, update or delete an employee? (or neither) (a/u/d/n): ";
@@ -1234,12 +1282,7 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                             cout << "Enter a ID: ";
                             cin >> EID;
 
-                            if (cin.fail()) {
-                                cin.clear();
-                                cin.ignore(1000, '\n');
-                                cout << acfr << "Invalid input. Please try again." << acr << endl;
-                                continue;
-                            }
+                            if (cin.fail()) {cinc(); continue;}
 
                             // check if ID already exists
 
@@ -1280,16 +1323,12 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                         Employee* employee;
                         std::string Name, ID, password;
                         std::string act;
+                        double record, dues, rentLimit;
 
                         cout << "Enter the ID of the employee you want to update: ";
                         cin >> (ID);
 
-                        if (cin.fail()) {
-                            cin.clear();
-                            cin.ignore(1000, '\n');
-                            cout << acfr << "Invalid input. Please try again." << acr << endl;
-                            continue;
-                        }
+                        if (cin.fail()) {cinc(); continue;}
 
                         if (!DBMgr->findUser(ID)) {
                             cout << acfr << "Employee not found!" << acr << "Please enter corrrect ID." << endl;
@@ -1302,6 +1341,8 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                         if (act[0] == 'y' || act[0] == 'Y') {
                             cout << "Enter the new name: ";
                             cin >> (Name);
+                        } else {
+                            Name = DBMgr->getEmployee(ID)->getName();
                         }
 
                         cout << "Do you want to update the password? (y/n): ";
@@ -1310,6 +1351,47 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                         if (act[0] == 'y' || act[0] == 'Y') {
                             cout << "Enter the new password: ";
                             password = getPassword();
+                        } else {
+                            password = DBMgr->getEmployee(ID)->getPassword();
+                        }
+
+                        cout << "Do you want to update the record? (y/n): ";
+                        cin >> (act);
+
+                        if (act[0] == 'y' || act[0] == 'Y') {
+                            cout << "Enter the new record: ";
+                            cin >> record;
+
+                            if (cin.fail()) {cinc(); continue;}
+
+                        } else {
+                            record = DBMgr->getEmployee(ID)->getRecord();
+                        }
+
+                        cout << "Do you want to update the dues? (y/n): ";
+                        cin >> (act);
+
+                        if (act[0] == 'y' || act[0] == 'Y') {
+                            cout << "Enter the new dues: ";
+                            cin >> dues;
+
+                            if (cin.fail()) {cinc(); continue;}
+
+                        } else {
+                            dues = DBMgr->getEmployee(ID)->getDue();
+                        }
+
+                        cout << "Do you want to update the rent limit? (y/n): ";
+                        cin >> (act);
+
+                        if (act[0] == 'y' || act[0] == 'Y') {
+                            cout << "Enter the new rent limit: ";
+                            cin >> rentLimit;
+
+                            if (cin.fail()) {cinc(); continue;}
+
+                        } else {
+                            rentLimit = DBMgr->getEmployee(ID)->getRentLimit();
                         }
 
                         cout << "Are you sure you want to update this employee? (y/n): ";
@@ -1346,12 +1428,7 @@ void Login(DBMgr* DBMgr, User* currentUser, bool& isRunning) {
                             break;
                         }
 
-                        if (cin.fail()) {
-                            cin.clear();
-                            cin.ignore(1000, '\n');
-                            cout << acfr << "Invalid input. Please try again." << acr << endl;
-                            continue;
-                        }
+                        if (cin.fail()) {cinc(); continue;}
 
                         if (!DBMgr->findUser(ID)) {
                             cout << acfr << "Employee not found!" << acr << "Please enter corrrect ID." << endl;
