@@ -11,6 +11,10 @@
     ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ```
 
+```diff
+! DISCLAIMER : This software was compiled on g++ version 6.3 and might break on later versions.
+```
+
 ## Setup Instructions :
 
 1. Clone this repo
@@ -70,10 +74,8 @@
 
 ### CarsDB
 
-| | | | | | | | |
-|-|-|-|-|-|-|-|-|
-|cars| | | | | | | |
 |condition|dailyRent|expectedDays|isRented|model|regNo|rentDate|renterID|
+|-|-|-|-|-|-|-|-|
 |74.0|2500.0|5|TRUE|Lightning McQueen|MCQRCR|12/2/2023|gotham|
 |60.0|2000.0|5|FALSE|Tow Mater|TOWM8R|1/1/2001||
 |86.0|3500.0|5|FALSE|Batmobile|BATMAN|1/1/2001||
@@ -83,10 +85,8 @@
 
 ### CustomersDB
 
-| | | | | | | | |
-|-|-|-|-|-|-|-|-|
-|customers| | | | | | | |
 |ID|due|memberType|name|password|record|rentLimit|rentedCars|
+|-|-|-|-|-|-|-|-|
 |sheldont|0.0|Customer|Sheldon Cooper|bazinga|71.6|5| |
 |breakingbad|0.0|Customer|Walter White|wizwhite|75.0|5| |
 |dp|0.0|Customer|Deadpool|regenerate|71.0|3| |
@@ -96,10 +96,8 @@
 
 ### EmployeesDB
 
-| | | | | | | | | | | | | | | |
-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
-|employees| | | | | | | | | | | | | | |
 |ID|due|memberType|name|password|record|rentLimit|rentedCars| | | | | | | |
+|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
 | | | | | | | |condition|dailyRent|expectedDays|isRented|model|regNo|rentDate|renterID|
 |007|0.0|Employee|James Bond|bond007|75.0|5| | | | | | | | |
 |mindpalace|0.0|Employee|Sherlock Holmes|elementary|75.0|5| | | | | | | | |
