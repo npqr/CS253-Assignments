@@ -1,0 +1,236 @@
+\documentclass{article}
+\usepackage[left=1.5cm, right=2cm]{geometry}
+\usepackage{amsmath}
+%\usepackage{mhchem}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{relsize}
+\usepackage{algpseudocode}
+\usepackage{tikz}
+\usepackage{float}
+
+%\usepackage{mathptmx,courier}
+\usepackage[scaled=0.92]{helvet}
+\normalfont
+\usepackage{pifont,tabularx,varioref,url}
+\usepackage[T1]{fontenc}
+\usepackage{tcolorbox} 
+\usepackage{hyperref}
+
+\DeclareMathOperator{\adj}{adj}
+\DeclareMathOperator{\A}{\emph{\textbf{A}}}
+\DeclareMathOperator{\B}{\emph{\textbf{B}}}
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\N}{\mathbb{N}}
+
+\usepackage[style=alphabetic,citestyle=alphabetic,backend=biber,backref=true]{biblatex}
+\addbibresource{bib}
+
+% \input{structure2.tex} % Include the file specifying the document structure and custom commands
+
+% %----------------------------------------------------------------------------------------
+% %	ASSIGNMENT INFORMATION
+% %----------------------------------------------------------------------------------------
+
+% % Required
+% \newcommand{\assignmentQuestionName}{P} % The word to be used as a prefix to question numbers; example alternatives: Problem, Exercise
+% \newcommand{\assignmentTitle}{\text{CS201 Endsem 2023}} % Assignment title or name
+% \newcommand{\assignmentAuthorName}{Pathe Nevish Ashok (220757)}
+
+% Optional (comment lines to remove)
+%\newcommand{\assignmentClassInstructor}{ } % Intructor name/time/description
+%\newcommand{\assignmentDueDate}{ } % Due date
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    {\scshape\LARGE Indian Institute of Technology, Kanpur \par}
+    \vspace{1cm}
+    {\scshape\Large CS253: Python Programming Assignment\par}
+    \vspace{1.5cm}
+    {\huge\bfseries Assignment Report\par}
+    \vspace{2cm}
+    {\Large\itshape Pathe Nevish Ashok (220757)\par}
+    \vfill
+    {\large \today\par}
+\end{titlepage}
+
+\section{Methodology}
+
+\subsection{Data Preprocessing}
+
+The dataset given to us had the columns \texttt{Total Assets} and \texttt{Total Liabilities}. These columns
+contained the amounts not in numerical format but in word format (e.g. \texttt{One Crore+} instead of \texttt{10000000}).
+Thus, these columns were preprocessed, to convert into numeric values.
+
+Also, the columns \texttt{Party}, \texttt{State} and \texttt{Constituency} corresponded to
+categorical variables, so there were One-Hot Encoded. This was done using the \texttt{sklearn.preprocessing.OneHotEncoder} \cite{scikit-learn} class wrapped inside a \texttt{ColumnTransformer}.
+
+\paragraph*{Why One-Hot Encoding and not Label Encoding?}
+{
+    Label Encoding would have assigned a numerical value to each category, which would have been misleading to the model. For example, if we had used Label Encoding on the \texttt{State} column, the model would have assumed that the states are ordinal, which is not the case.
+    Although One-Hot Encoding increases the dimensionality of the dataset, it is a better choice in this case.
+}
+
+\subsection{Feature Engineering}
+
+A new column \texttt{Wealth} was created by subtracting the \texttt{Liabilities} from the \texttt{Total Assets} column.
+This column was created to see if the wealth of a candidate has any effect on the criminal cases filed against them.
+Didn't give any significant improvement in the model, but was kept for analysis purposes. So was later dropped.
+
+\subsection{Identifying Outliers}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{images/asslib.png}
+    \caption{Scatter Plot of Assets vs Liabilities}
+    \label{fig:asslib}
+\end{figure}
+
+Although very few, but there were some outliers in the dataset.
+These were identified using the \texttt{Z-Score} method and were removed from the dataset (\texttt{threshold = 3}).
+
+\subsection{Normalization, Standardization and Transformation}
+
+Like categorical variables, numerical variables were also preprocessed.
+The \texttt{Total Assets}, \texttt{Liabilities} and \texttt{Criminal Case} columns were normalized using the \texttt{StandardScaler} class from \texttt{sklearn.preprocessing}. \cite{scikit-learn}
+
+\subsection{Data Augmentation}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/edu_smote.png}
+    \caption{Histogram of Education}
+    \label{fig:edu}
+\end{figure}
+
+
+\paragraph{Why the need for data augmentation?}{
+    We can clearly see that the dataset is imbalanced.
+    The classes \texttt{(Others, Doctorate, Literate, 5th Pass, 8th Pass)} have
+    very few samples, while the class \texttt{Graduate} has the most samples.
+    The dataset was augmented using the \texttt{SMOTE} class from \texttt{imblearn.over\_sampling} module. \cite{imbalanced-learn}
+    Number of samples were increased from 2059 to 3707. {\cite{Cha02}}
+}
+
+The ADASYN \cite{4633969} method was also tried, but it did not give better results than SMOTE.
+
+\section{Experiment Details}
+
+The jupyter notebook containing code and graphs is available
+at this \href{https://github.com/npqr/CS253-Assignments/blob/main/Assignment_3/witrw_220757_PatheNevishAshok.ipynb}{Github Repo}.
+
+\subsection{Models Used}
+
+The train dataset was split into 80\% training and 20\% validation dataset.
+The following models were used to train the dataset:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{| l | l |}
+        \hline
+        \textbf{Model (Best)} & \textbf{Parameters} \\ 
+        \hline
+        Random Forest Classifier & \texttt{n\_estimators=100} \\
+        SV Classifier           & \texttt{kernel='rbf', C=7} \\
+        KNN Classifier          & \texttt{n\_neighbors=10} \\
+        Decision Tree Classifier & \texttt{max\_depth=15, criterion='gini', splitter='best'} \\
+        \hline
+    \end{tabular}
+    \caption{Unique Values in each Column}
+    \label{tab:unique_values}
+\end{table}
+
+Out of these models, the Random Forest and Support Vector Classifier gave the best results.
+Decision Tree models are prone to overfitting, so the Decision Tree Classifier was not used in the final model.
+The SVM model was trained for final predictions.
+
+The optimal value of \texttt{C} for out SVC Model was grid-searched over different combinations of
+\texttt{C} and \texttt{kernel}
+
+A Bernoulli Naive Bayes model was also tried, but didn't give significant improvement, so was later dropped.
+
+\subsection{Data Insights}
+(We are doing the analysis on the original \texttt{train.csv} training dataset)
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{c | c}
+        \textbf{Column} & \textbf{Unique Values} \\
+        \hline
+        ID              & 2059                   \\
+        Candidate       & 2039                   \\
+        Constituency    & 2037                   \\
+        Party           & 23                     \\
+        Criminal Case   & 35                     \\
+        Total Assets    & 210                    \\
+        Liabilities     & 170                    \\
+        State           & 28                     \\
+        Education       & 10                     \\
+    \end{tabular}
+    \caption{Unique Values in each Column}
+    \label{tab:unique_values}
+\end{table}
+
+
+\begin{tcolorbox}[colback=red!5!white,colframe=red!75!black]
+    \textbf{Note 1:} The Constituency column has 2037 unique values. But
+    even after considering Constituency as a categorical variable and One-Hot Encoding it
+    the model reported an anomalous increase in F1 score, which might be due to increased
+    dimensionality. Thus, the Constituency column was dropped.
+\end{tcolorbox}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/c_w.png}
+    \caption{Percentage Distribution of Parties according to most Crime Cases, Wealth}
+    \label{fig:cw}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/edu_party.png}
+    \caption{Candidates' Education Distribution according to Party}
+    \label{fig:edup}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/corr.png}
+    \caption{Correlation Matrix}
+    \label{fig:corr}
+\end{figure}
+
+Here, we can see that the \texttt{Total Assets} and \texttt{Liabilities} columns are highly correlated.
+Note that we have removed the \texttt{Constituency} column, so it is not present in the correlation matrix.
+
+\section{Results}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+        Leaderboard & Score            & Rank* \\
+        \hline
+        Public      & \texttt{0.26277} & 32    \\
+        \hline
+        Private     & \texttt{0.25377} & 35    \\
+        \hline
+    \end{tabular}
+    \caption{Leaderboard Scores and Ranks}
+    \label{tab:leaderboard}
+\end{table}
+
+Final F1 Score : \texttt{0.25377}\\
+Personal Best F1 score on the private dataset was \texttt{0.26156} (not evaluated, Apparent Rank 19), while that on public dataset was \texttt{0.26277}.
+
+\section{References}
+
+\printbibliography[heading=none]
+
+
+\end{document}
